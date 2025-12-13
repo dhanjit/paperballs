@@ -1,0 +1,129 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Create CLI package
+      run: |
+        mkdir -p release/paperballs-cli
+        cp -r cli/* release/paperballs-cli/
+        cp README.md RULES.md LICENSE release/paperballs-cli/
+        cd release
+        zip -r paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.zip paperballs-cli
+        tar -czf paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.tar.gz paperballs-cli
+
+    - name: Create Web package
+      run: |
+        mkdir -p release/paperballs-web
+        cp -r web/* release/paperballs-web/
+        cp README.md RULES.md LICENSE release/paperballs-web/
+        cd release
+        zip -r paperballs-web-v${{ steps.get_version.outputs.VERSION }}.zip paperballs-web
+        tar -czf paperballs-web-v${{ steps.get_version.outputs.VERSION }}.tar.gz paperballs-web
+
+    - name: Create complete source package
+      run: |
+        cd release
+        zip -r paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip ../. -x "*.git*" -x "*release*" -x "*node_modules*" -x "*__pycache__*"
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        cat > release_notes.md << 'EOF'
+        ## Paperballs v${{ steps.get_version.outputs.VERSION }}
+
+        A strategic two-player grid game recreated from childhood memories.
+
+        ### 📦 Downloads
+
+        Choose the version you want to play:
+
+        **🖥️ Terminal/CLI Version (Python)**
+        - Download `paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.zip` or `.tar.gz`
+        - Requires Python 3.7+
+        - Run: `python3 paperballs.py`
+
+        **🌐 Web Version (Browser)**
+        - Download `paperballs-web-v${{ steps.get_version.outputs.VERSION }}.zip` or `.tar.gz`
+        - No dependencies needed
+        - Just open `index.html` in a browser
+
+        **📦 Complete Source**
+        - Download `paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip`
+        - Includes all versions, documentation, and development files
+
+        ### ✨ Features
+
+        - Two-phase gameplay (placement and movement)
+        - Configurable grid sizes (3×3 to 7×7)
+        - Strategic depth with simple rules
+        - Cross-platform compatibility
+
+        ### 📖 Documentation
+
+        - [README.md](README.md) - Getting started
+        - [RULES.md](RULES.md) - Complete game rules
+        - [CLAUDE.md](CLAUDE.md) - AI collaboration transparency
+
+        ### 🎮 How to Play
+
+        **Objective:** Form a straight line with all your paperballs
+
+        1. **Placement Phase:** Take turns placing balls on grid vertices
+        2. **Movement Phase:** Move balls to adjacent empty vertices
+        3. **Win:** Form a horizontal, vertical, or diagonal line
+
+        ---
+
+        Made with ❤️ | [dhanjit.me](https://dhanjit.me)
+        EOF
+
+        echo "notes_file=release_notes.md" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: release_notes.md
+        files: |
+          release/paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.zip
+          release/paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.tar.gz
+          release/paperballs-web-v${{ steps.get_version.outputs.VERSION }}.zip
+          release/paperballs-web-v${{ steps.get_version.outputs.VERSION }}.tar.gz
+          release/paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Summary
+      run: |
+        echo "## Release Created! 🎉" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Version: v${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Artifacts Created:" >> $GITHUB_STEP_SUMMARY
+        echo "- CLI version (zip & tar.gz)" >> $GITHUB_STEP_SUMMARY
+        echo "- Web version (zip & tar.gz)" >> $GITHUB_STEP_SUMMARY
+        echo "- Complete source (zip)" >> $GITHUB_STEP_SUMMARY

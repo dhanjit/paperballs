@@ -1,5 +1,9 @@
 # Paperballs
 
+![CI](https://github.com/dhanjit/paperballs/workflows/CI/badge.svg)
+![Release](https://github.com/dhanjit/paperballs/workflows/Release/badge.svg)
+![GitHub Pages](https://github.com/dhanjit/paperballs/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
+
 A childhood game recreated - a strategic two-player game combining placement and movement mechanics.
 
 ## Overview
@@ -44,10 +48,10 @@ A player wins by forming a straight line with their paperballs in any direction:
 ## Project Goals
 
 1. ✅ Document the rules and gameplay
-2. ⬜ Create a playable web version (hosted on dhanjit.me)
-3. ⬜ Develop a terminal/CLI version
+2. ✅ Create a playable web version (hosted on dhanjit.me)
+3. ✅ Develop a terminal/CLI version
 4. ⬜ Create mobile apps
-5. ⬜ Write a blog post documenting the development process
+5. ✅ Write a blog post documenting the development process
 
 ## Versions
 
@@ -55,9 +59,72 @@ A player wins by forming a straight line with their paperballs in any direction:
 - **Web:** Browser-based version with interactive UI
 - **Mobile:** Native apps for iOS and Android (planned)
 
+## Getting Started
+
+### Play the Web Version
+
+**Option 1: GitHub Pages (Live)**
+```
+https://dhanjit.github.io/paperballs/
+```
+
+**Option 2: Local**
+```bash
+# Clone the repository
+git clone https://github.com/dhanjit/paperballs.git
+cd paperballs/web
+
+# Open in browser
+open index.html  # macOS
+xdg-open index.html  # Linux
+start index.html  # Windows
+```
+
+### Play the Terminal Version
+
+```bash
+# Navigate to CLI directory
+cd paperballs/cli
+
+# Run the game (requires Python 3.7+)
+python3 paperballs.py
+```
+
+## CI/CD & Automation
+
+This project uses GitHub Actions for:
+- **Continuous Integration**: Automated code validation on every push
+- **Releases**: Automatic package creation when tags are pushed
+- **Deployment**: Auto-deploy web version to GitHub Pages
+- **Health Checks**: Weekly project monitoring
+
+See [.github/workflows/README.md](.github/workflows/README.md) for details.
+
 ## Development
 
 This project is a recreation of a childhood game, preserving the simple yet strategic gameplay while making it accessible across different platforms.
+
+### Project Structure
+```
+paperballs/
+├── cli/          # Python terminal version
+├── web/          # Browser-based version
+├── mobile/       # Mobile app plans
+├── docs/         # Documentation and blog
+└── .github/      # CI/CD workflows
+```
+
+### Contributing
+
+Contributions are welcome! Please feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+- Share your memories of similar games
+
+## AI Collaboration
+
+This project was developed with assistance from Claude AI. See [CLAUDE.md](CLAUDE.md) for full transparency about the AI's role in development.
 
 ## License
 

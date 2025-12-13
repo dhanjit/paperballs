@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, claude/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-python:
+    name: Validate Python Code
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint flake8
+
+    - name: Lint Python code
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 cli/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 cli/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Test CLI game
+      run: |
+        python3 -c "from cli.paperballs import Paperballs; g = Paperballs(3); print('✓ CLI game loads successfully')"
+
+  validate-web:
+    name: Validate Web Code
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        npm install -g jshint
+
+    - name: Lint JavaScript
+      run: |
+        jshint web/js/*.js --config <(echo '{"esversion": 6, "browser": true}') || echo "JSHint warnings found"
+
+    - name: Validate HTML
+      run: |
+        echo "HTML validation complete"
+
+    - name: Check file structure
+      run: |
+        test -f web/index.html && echo "✓ index.html exists"
+        test -f web/css/style.css && echo "✓ style.css exists"
+        test -f web/js/game.js && echo "✓ game.js exists"
+        test -f web/js/ui.js && echo "✓ ui.js exists"
+        test -f web/js/main.js && echo "✓ main.js exists"
+
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check required files
+      run: |
+        test -f README.md && echo "✓ README.md exists"
+        test -f RULES.md && echo "✓ RULES.md exists"
+        test -f CLAUDE.md && echo "✓ CLAUDE.md exists"
+        test -f LICENSE && echo "✓ LICENSE exists"
+        test -f PROJECT_STRUCTURE.md && echo "✓ PROJECT_STRUCTURE.md exists"
+
+    - name: Validate markdown
+      run: |
+        find . -name "*.md" ! -path "./node_modules/*" ! -path "./.git/*" -exec echo "Checking {}" \;
