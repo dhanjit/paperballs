@@ -11,17 +11,19 @@ from typing import List, Tuple, Optional, Set
 class Paperballs:
     """Main game class for Paperballs"""
 
-    def __init__(self, n: int = 5):
+    def __init__(self, n: int = 5, diagonal_mode: str = 'short'):
         """
         Initialize the game with an NxN grid
 
         Args:
             n: Grid size (minimum 3)
+            diagonal_mode: 'none', 'short', or 'all'
         """
         if n < 3:
             raise ValueError("Grid size must be at least 3")
 
         self.n = n
+        self.diagonal_mode = diagonal_mode
         self.grid = [[None for _ in range(n)] for _ in range(n)]
         self.current_player = 1
         self.phase = "placement"  # "placement" or "movement"
@@ -58,17 +60,44 @@ class Paperballs:
 
     def get_adjacent_positions(self, row: int, col: int) -> List[Tuple[int, int]]:
         """
-        Get all adjacent positions (8 directions: horizontal, vertical, diagonal)
+        Get all adjacent positions based on diagonal mode
 
         Returns:
             List of (row, col) tuples for adjacent positions
         """
         adjacent = []
-        directions = [
-            (-1, -1), (-1, 0), (-1, 1),
-            (0, -1),           (0, 1),
-            (1, -1),  (1, 0),  (1, 1)
+
+        # Orthogonal directions (always included)
+        orthogonal = [
+            (-1, 0),  # up
+            (0, -1),  # left
+            (0, 1),   # right
+            (1, 0)    # down
         ]
+
+        # Short diagonal directions
+        short_diagonal = [
+            (-1, -1),  # up-left
+            (-1, 1),   # up-right
+            (1, -1),   # down-left
+            (1, 1)     # down-right
+        ]
+
+        # Add directions based on diagonal mode
+        if self.diagonal_mode == 'none':
+            directions = orthogonal
+        elif self.diagonal_mode == 'short':
+            directions = orthogonal + short_diagonal
+        elif self.diagonal_mode == 'all':
+            directions = orthogonal + short_diagonal
+            # Add long diagonals and orthogonals
+            for i in range(2, self.n):
+                directions.extend([
+                    (-i, -i), (-i, i), (i, -i), (i, i),  # long diagonals
+                    (-i, 0), (i, 0), (0, -i), (0, i)     # long orthogonals
+                ])
+        else:
+            directions = orthogonal + short_diagonal  # default to short
 
         for dr, dc in directions:
             new_row, new_col = row + dr, col + dc
@@ -272,11 +301,33 @@ def main():
 
     try:
         n = int(input().strip())
-        game = Paperballs(n)
-        game.play()
     except ValueError:
         print("Invalid input! Using default size 5.")
-        game = Paperballs(5)
+        n = 5
+    except KeyboardInterrupt:
+        print("\nGoodbye!")
+        sys.exit(0)
+
+    print("\nChoose diagonal mode:")
+    print("  1. No Diagonals (4-way movement)")
+    print("  2. Short Diagonals (8-way movement) [Default]")
+    print("  3. All Diagonals (includes long diagonals)")
+    print("Enter choice (1/2/3): ", end="")
+
+    try:
+        choice = input().strip()
+        if choice == '1':
+            diagonal_mode = 'none'
+        elif choice == '3':
+            diagonal_mode = 'all'
+        else:
+            diagonal_mode = 'short'  # default
+    except KeyboardInterrupt:
+        print("\nGoodbye!")
+        sys.exit(0)
+
+    try:
+        game = Paperballs(n, diagonal_mode)
         game.play()
     except KeyboardInterrupt:
         print("\nGoodbye!")
