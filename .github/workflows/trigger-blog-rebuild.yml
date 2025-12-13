@@ -1,0 +1,19 @@
+name: Trigger Blog Rebuild
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger update in dhanjit.me
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: dhanjit/dhanjit.me
+          event-type: update-paperballs
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
