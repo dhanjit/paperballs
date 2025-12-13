@@ -396,6 +396,103 @@ Add your personal touches
 
 ---
 
+## Development Log Maintenance
+
+**IMPORTANT FOR FUTURE AI SESSIONS:** Always maintain `docs/development-log.md` as an append-only chronicle of the project's evolution.
+
+### Purpose
+- Track all significant changes across AI collaboration sessions
+- Provide transparency about project decisions and evolution
+- Help future contributors (human or AI) understand the "why" behind changes
+- Maintain continuity when development resumes after breaks
+
+### When to Update
+
+Append new entries after:
+- ✅ Adding new features or functionality
+- ✅ Making architectural decisions
+- ✅ Fixing significant bugs
+- ✅ Changing project structure or configuration
+- ✅ Updating dependencies, workflows, or deployment
+- ✅ Clarifying or updating game rules based on user feedback
+
+### Format: Append-Only Journal
+
+**DO NOT modify or restructure old entries.** Simply append new entries at the end.
+
+Each entry should include:
+
+```markdown
+---
+
+## [Date] - [Brief Title]
+
+**Context:** What prompted this change
+
+**Changes Made:**
+- File 1: Description
+- File 2: Description
+- etc.
+
+**Decisions & Rationale:**
+- Why this approach was chosen
+- Alternatives considered
+- Trade-offs accepted
+
+**Impact:**
+- What this enables or improves
+- Any breaking changes or considerations
+
+**Commit:** [commit hash if applicable]
+```
+
+### Example Entry
+
+```markdown
+---
+
+## 2025-12-13 - Configurable Diagonal Movement
+
+**Context:** User remembered the original game had different diagonal
+configurations, not just the standard 8-way movement.
+
+**Changes Made:**
+- web/js/game.js: Added `diagonalMode` parameter to constructor
+- web/js/ui.js: Updated grid drawing to show/hide diagonals based on mode
+- web/index.html: Added diagonal mode dropdown selector
+- cli/paperballs.py: Added diagonal mode selection in CLI
+- RULES.md: Documented three diagonal modes with visual examples
+- README.md: Updated Quick Start to mention diagonal options
+
+**Decisions & Rationale:**
+- Three modes: 'none' (4-way), 'short' (8-way standard), 'all' (includes long diagonals)
+- Default to 'short' for backward compatibility with original implementation
+- Visual distinction: Long diagonals shown as dashed lines in web version
+- Same feature across both CLI and web versions for consistency
+
+**Impact:**
+- More strategic variety for players
+- Beginner-friendly option with no diagonals
+- Advanced option for complex gameplay
+- Both versions maintain feature parity
+
+**Commit:** bd288d2
+```
+
+### Guidelines
+
+- **Be factual, not promotional** - Focus on what/why/how
+- **Include commit hashes** - Links decisions to code
+- **Document trade-offs** - Explain why one approach over another
+- **Keep entries concise** - Enough detail to understand, not exhaustive
+- **Never delete history** - Append only, preserve the journey
+
+### Current Log Location
+
+`docs/development-log.md`
+
+---
+
 ## Contact and Feedback
 
 If you have questions about:
