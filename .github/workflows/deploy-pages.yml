@@ -1,56 +1,107 @@
+# ============================================================================
+# Deploy to GitHub Pages
+# ============================================================================
+# This workflow automatically deploys the web version of Paperballs to
+# GitHub Pages, making it playable at https://dhanjit.github.io/paperballs/
+#
+# Triggers:
+#   - Push to main branch
+#   - Manual trigger via workflow_dispatch
+#
+# Setup Required:
+#   1. Go to repository Settings → Pages
+#   2. Set Source to "GitHub Actions"
+#   3. Save
+#
+# The game will be live at: https://<username>.github.io/paperballs/
+# ============================================================================
+
 name: Deploy to GitHub Pages
 
+# Workflow triggers
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:  # Allow manual trigger
+    branches: [ main ]  # Deploy on every push to main
+  workflow_dispatch:    # Allow manual trigger from Actions tab
 
+# Permissions required for GitHub Pages deployment
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read   # Read repository contents
+  pages: write     # Write to GitHub Pages
+  id-token: write  # Required for authentication
 
+# Ensure only one deployment runs at a time
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: "pages"                # Group name for concurrency
+  cancel-in-progress: false     # Don't cancel in-progress deployments
 
 jobs:
+  # ==========================================================================
+  # Job: Deploy to GitHub Pages
+  # ==========================================================================
+  # Prepares files and deploys to GitHub Pages
   deploy:
     name: Deploy Web Version
     runs-on: ubuntu-latest
 
+    # Environment configuration
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: github-pages                                # Environment name
+      url: ${{ steps.deployment.outputs.page_url }}    # Deployed URL
 
     steps:
-    - uses: actions/checkout@v4
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    # ==========================================================================
+    # Prepare Deployment Files
+    # ==========================================================================
+    # Copy web files and documentation to deployment directory
     - name: Prepare deployment files
       run: |
+        # Create deployment directory
         mkdir -p _site
+
+        # Copy all web files (HTML, CSS, JS)
         cp -r web/* _site/
+
+        # Copy documentation files for reference
         cp README.md RULES.md CLAUDE.md LICENSE _site/
 
-        # Create a simple index redirect if needed
+        # Verify index.html exists (sanity check)
         if [ ! -f _site/index.html ]; then
-          echo "Web files copied successfully"
+          echo "Error: index.html not found!"
+          exit 1
+        else
+          echo "✓ Web files copied successfully"
         fi
 
+    # Configure GitHub Pages
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
+    # Upload prepared files as deployment artifact
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: '_site'
+        path: '_site'  # Directory containing files to deploy
 
+    # ==========================================================================
+    # Deploy to GitHub Pages
+    # ==========================================================================
+    # Actually deploy the artifact to GitHub Pages
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
 
+    # ==========================================================================
+    # Deployment Summary
+    # ==========================================================================
+    # Display success message with live URL
     - name: Summary
       run: |
+        # Create formatted summary visible in Actions tab
         echo "## Deployment Successful! 🚀" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "Your Paperballs game is now live at:" >> $GITHUB_STEP_SUMMARY

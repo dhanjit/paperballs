@@ -1,87 +1,149 @@
+# ============================================================================
+# Continuous Integration (CI) Workflow
+# ============================================================================
+# This workflow validates code quality on every push and pull request.
+# It runs three parallel jobs to check Python, JavaScript, and documentation.
+#
+# Triggers:
+#   - Push to main, develop, or claude/* branches
+#   - Pull requests targeting main or develop
+#
+# Jobs:
+#   1. validate-python: Lints Python code and tests CLI game initialization
+#   2. validate-web: Validates JavaScript and web file structure
+#   3. validate-docs: Ensures all documentation files exist
+# ============================================================================
+
 name: CI
 
+# Workflow triggers
 on:
   push:
-    branches: [ main, develop, claude/* ]
+    branches: [ main, develop, claude/* ]  # Run on pushes to these branches
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop ]             # Run on PRs to these branches
 
 jobs:
+  # ==========================================================================
+  # Job 1: Validate Python Code
+  # ==========================================================================
+  # Validates the CLI version of the game written in Python
   validate-python:
     name: Validate Python Code
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Use latest Ubuntu runner
 
     steps:
-    - uses: actions/checkout@v4
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    # Setup Python environment
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.9'
+        python-version: '3.9'  # Python 3.9 for compatibility testing
 
+    # Install Python linting tools
     - name: Install dependencies
       run: |
+        # Upgrade pip to latest version
         python -m pip install --upgrade pip
+        # Install linting tools: pylint and flake8
         pip install pylint flake8
 
+    # Run flake8 linter to check Python code quality
     - name: Lint Python code
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
+        # Critical errors only - fail build if found
+        # E9: Runtime errors, F63/F7/F82: Syntax/import errors
         flake8 cli/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings
+
+        # Style warnings - don't fail build, just report
+        # Max complexity: 10, Max line length: 127
         flake8 cli/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+    # Test that the CLI game can be imported and initialized
     - name: Test CLI game
       run: |
+        # Quick smoke test: import module and create game instance
         python3 -c "from cli.paperballs import Paperballs; g = Paperballs(3); print('✓ CLI game loads successfully')"
 
+  # ==========================================================================
+  # Job 2: Validate Web Code
+  # ==========================================================================
+  # Validates the web version's JavaScript, HTML, and file structure
   validate-web:
     name: Validate Web Code
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    # Setup Node.js for JavaScript tooling
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '18'  # Node 18 LTS
 
+    # Install JavaScript linting tools
     - name: Install dependencies
       run: |
+        # Install JSHint globally for JavaScript linting
         npm install -g jshint
 
+    # Lint JavaScript files
     - name: Lint JavaScript
       run: |
+        # Run JSHint on all JS files in web/js/
+        # Config: ES6 syntax, browser environment
+        # Note: Using || echo to not fail build on warnings
         jshint web/js/*.js --config <(echo '{"esversion": 6, "browser": true}') || echo "JSHint warnings found"
 
+    # Validate HTML structure
     - name: Validate HTML
       run: |
+        # Placeholder for HTML validation
+        # Future: Add actual HTML validator (e.g., html5validator)
         echo "HTML validation complete"
 
+    # Verify all required web files exist
     - name: Check file structure
       run: |
+        # Ensure all critical web files are present
         test -f web/index.html && echo "✓ index.html exists"
         test -f web/css/style.css && echo "✓ style.css exists"
         test -f web/js/game.js && echo "✓ game.js exists"
         test -f web/js/ui.js && echo "✓ ui.js exists"
         test -f web/js/main.js && echo "✓ main.js exists"
 
+  # ==========================================================================
+  # Job 3: Validate Documentation
+  # ==========================================================================
+  # Ensures all required documentation files are present
   validate-docs:
     name: Validate Documentation
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    # Check that all required documentation files exist
     - name: Check required files
       run: |
+        # Verify critical documentation files are present
         test -f README.md && echo "✓ README.md exists"
         test -f RULES.md && echo "✓ RULES.md exists"
         test -f CLAUDE.md && echo "✓ CLAUDE.md exists"
         test -f LICENSE && echo "✓ LICENSE exists"
         test -f PROJECT_STRUCTURE.md && echo "✓ PROJECT_STRUCTURE.md exists"
 
+    # List all markdown files for validation
     - name: Validate markdown
       run: |
+        # Find and list all markdown files (excluding node_modules and .git)
+        # Future: Add markdown linter (e.g., markdownlint)
         find . -name "*.md" ! -path "./node_modules/*" ! -path "./.git/*" -exec echo "Checking {}" \;
