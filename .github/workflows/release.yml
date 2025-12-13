@@ -1,56 +1,124 @@
+# ============================================================================
+# Release Workflow
+# ============================================================================
+# This workflow automatically creates GitHub releases with downloadable
+# packages when a version tag is pushed (e.g., v1.0.0).
+#
+# Triggers:
+#   - Push of tags matching 'v*' (e.g., v1.0.0, v2.1.3)
+#
+# Outputs:
+#   - GitHub Release with auto-generated release notes
+#   - 5 downloadable packages:
+#     1. CLI version (zip)
+#     2. CLI version (tar.gz)
+#     3. Web version (zip)
+#     4. Web version (tar.gz)
+#     5. Complete source code (zip)
+#
+# Usage:
+#   git tag -a v1.0.0 -m "Release version 1.0.0"
+#   git push origin v1.0.0
+# ============================================================================
+
 name: Release
 
+# Workflow triggers
 on:
   push:
     tags:
-      - 'v*'  # Trigger on version tags like v1.0.0
+      - 'v*'  # Trigger on any tag starting with 'v' (e.g., v1.0.0)
 
+# Permissions required for creating releases
 permissions:
-  contents: write
+  contents: write  # Needed to create releases and upload assets
 
 jobs:
+  # ==========================================================================
+  # Job: Create Release
+  # ==========================================================================
+  # Creates packages and publishes a GitHub release
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # Checkout the repository code at the tagged commit
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    # Setup Python for any build tasks that might need it
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
+    # Extract version number from the git tag
     - name: Get version from tag
       id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      run: |
+        # Remove 'refs/tags/v' prefix to get version number
+        # Example: refs/tags/v1.0.0 → 1.0.0
+        echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+    # ==========================================================================
+    # Create CLI Package
+    # ==========================================================================
+    # Package the terminal/CLI version for distribution
     - name: Create CLI package
       run: |
+        # Create directory for CLI release
         mkdir -p release/paperballs-cli
+
+        # Copy CLI files and documentation
         cp -r cli/* release/paperballs-cli/
         cp README.md RULES.md LICENSE release/paperballs-cli/
+
+        # Create compressed packages in both zip and tar.gz formats
         cd release
         zip -r paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.zip paperballs-cli
         tar -czf paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.tar.gz paperballs-cli
 
+    # ==========================================================================
+    # Create Web Package
+    # ==========================================================================
+    # Package the web version for easy deployment
     - name: Create Web package
       run: |
+        # Create directory for web release
         mkdir -p release/paperballs-web
+
+        # Copy web files and documentation
         cp -r web/* release/paperballs-web/
         cp README.md RULES.md LICENSE release/paperballs-web/
+
+        # Create compressed packages in both zip and tar.gz formats
         cd release
         zip -r paperballs-web-v${{ steps.get_version.outputs.VERSION }}.zip paperballs-web
         tar -czf paperballs-web-v${{ steps.get_version.outputs.VERSION }}.tar.gz paperballs-web
 
+    # ==========================================================================
+    # Create Complete Source Package
+    # ==========================================================================
+    # Package everything including mobile plans and workflows
     - name: Create complete source package
       run: |
         cd release
-        zip -r paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip ../. -x "*.git*" -x "*release*" -x "*node_modules*" -x "*__pycache__*"
+        # Zip entire project, excluding build artifacts and git files
+        zip -r paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip ../. \
+          -x "*.git*" \
+          -x "*release*" \
+          -x "*node_modules*" \
+          -x "*__pycache__*"
 
+    # ==========================================================================
+    # Generate Release Notes
+    # ==========================================================================
+    # Create formatted release notes with download instructions
     - name: Generate release notes
       id: release_notes
       run: |
+        # Create markdown file with release notes
         cat > release_notes.md << 'EOF'
         ## Paperballs v${{ steps.get_version.outputs.VERSION }}
 
@@ -100,25 +168,35 @@ jobs:
         Made with ❤️ | [dhanjit.me](https://dhanjit.me)
         EOF
 
+        # Output the filename for use in next step
         echo "notes_file=release_notes.md" >> $GITHUB_OUTPUT
 
+    # ==========================================================================
+    # Create GitHub Release
+    # ==========================================================================
+    # Publish the release with all packages and notes
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        body_path: release_notes.md
+        body_path: release_notes.md  # Use generated release notes
         files: |
           release/paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.zip
           release/paperballs-cli-v${{ steps.get_version.outputs.VERSION }}.tar.gz
           release/paperballs-web-v${{ steps.get_version.outputs.VERSION }}.zip
           release/paperballs-web-v${{ steps.get_version.outputs.VERSION }}.tar.gz
           release/paperballs-complete-v${{ steps.get_version.outputs.VERSION }}.zip
-        draft: false
-        prerelease: false
+        draft: false       # Publish immediately (set to true for manual review)
+        prerelease: false  # Mark as stable release (set to true for beta/alpha)
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Automatically provided by GitHub
 
+    # ==========================================================================
+    # Job Summary
+    # ==========================================================================
+    # Display summary in GitHub Actions UI
     - name: Summary
       run: |
+        # Create formatted summary visible in Actions tab
         echo "## Release Created! 🎉" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "Version: v${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY

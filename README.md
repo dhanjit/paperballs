@@ -100,6 +100,110 @@ This project uses GitHub Actions for:
 
 See [.github/workflows/README.md](.github/workflows/README.md) for details.
 
+## Release Process
+
+Creating a new release is fully automated. Just push a version tag and GitHub Actions handles the rest!
+
+### Quick Release
+
+```bash
+# 1. Ensure all changes are committed
+git add .
+git commit -m "Prepare for release v1.0.0"
+git push
+
+# 2. Create and push a version tag
+git tag -a v1.0.0 -m "Release version 1.0.0 - Initial public release"
+git push origin v1.0.0
+
+# 3. Wait ~2 minutes for GitHub Actions to complete
+# 4. Check https://github.com/dhanjit/paperballs/releases for your release!
+```
+
+### What Gets Created
+
+When you push a version tag (e.g., `v1.0.0`), the release workflow automatically:
+
+1. **Creates 5 downloadable packages:**
+   - `paperballs-cli-v1.0.0.zip` - Terminal version (zip)
+   - `paperballs-cli-v1.0.0.tar.gz` - Terminal version (tar.gz)
+   - `paperballs-web-v1.0.0.zip` - Web version (zip)
+   - `paperballs-web-v1.0.0.tar.gz` - Web version (tar.gz)
+   - `paperballs-complete-v1.0.0.zip` - Complete source code
+
+2. **Generates release notes** with:
+   - Download instructions
+   - Feature highlights
+   - How to play guide
+   - Documentation links
+
+3. **Publishes to GitHub Releases** at:
+   ```
+   https://github.com/dhanjit/paperballs/releases
+   ```
+
+### Version Numbering
+
+Follow [Semantic Versioning](https://semver.org/) guidelines:
+
+- **Major version** (`v2.0.0`): Breaking changes or major new features
+- **Minor version** (`v1.1.0`): New features, backward compatible
+- **Patch version** (`v1.0.1`): Bug fixes, backward compatible
+
+Examples:
+```bash
+# Initial release
+git tag -a v1.0.0 -m "Initial public release"
+
+# Bug fix
+git tag -a v1.0.1 -m "Fix movement validation bug"
+
+# New feature
+git tag -a v1.1.0 -m "Add AI opponent feature"
+
+# Breaking change
+git tag -a v2.0.0 -m "Redesign game API"
+```
+
+### Pre-releases
+
+For beta or alpha versions:
+
+```bash
+# Beta release
+git tag -a v1.0.0-beta.1 -m "Beta release for testing"
+git push origin v1.0.0-beta.1
+
+# Alpha release
+git tag -a v2.0.0-alpha.1 -m "Alpha preview of v2"
+git push origin v2.0.0-alpha.1
+```
+
+### Managing Tags
+
+```bash
+# List all tags
+git tag
+
+# Delete a local tag
+git tag -d v1.0.0
+
+# Delete a remote tag
+git push origin --delete v1.0.0
+
+# View tag details
+git show v1.0.0
+```
+
+### Workflow Monitoring
+
+Track release progress at:
+```
+https://github.com/dhanjit/paperballs/actions/workflows/release.yml
+```
+
+The workflow typically completes in 1-2 minutes.
+
 ## Development
 
 This project is a recreation of a childhood game, preserving the simple yet strategic gameplay while making it accessible across different platforms.
