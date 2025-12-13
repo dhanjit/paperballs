@@ -1,0 +1,88 @@
+name: Weekly Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run every Sunday at midnight
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  health-check:
+    name: Project Health Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: Check Python version compatibility
+      run: |
+        echo "Testing Python 3.9"
+        python3 --version
+        python3 -c "from cli.paperballs import Paperballs; g = Paperballs(5); print('✓ Python 3.9 compatible')"
+
+    - name: Verify file integrity
+      run: |
+        echo "## File Integrity Check" >> $GITHUB_STEP_SUMMARY
+
+        # Check critical files exist
+        files=(
+          "README.md"
+          "RULES.md"
+          "CLAUDE.md"
+          "LICENSE"
+          "cli/paperballs.py"
+          "web/index.html"
+          "web/js/game.js"
+          "web/js/ui.js"
+          "web/js/main.js"
+        )
+
+        all_good=true
+        for file in "${files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✓ $file" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ $file missing!" >> $GITHUB_STEP_SUMMARY
+            all_good=false
+          fi
+        done
+
+        if [ "$all_good" = true ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All critical files present ✓" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Count lines of code
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Code Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        python_lines=$(find . -name "*.py" ! -path "./.git/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+        js_lines=$(find . -name "*.js" ! -path "./.git/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+        html_lines=$(find . -name "*.html" ! -path "./.git/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+        css_lines=$(find . -name "*.css" ! -path "./.git/*" -exec wc -l {} + | tail -1 | awk '{print $1}')
+
+        echo "- Python: ${python_lines} lines" >> $GITHUB_STEP_SUMMARY
+        echo "- JavaScript: ${js_lines} lines" >> $GITHUB_STEP_SUMMARY
+        echo "- HTML: ${html_lines} lines" >> $GITHUB_STEP_SUMMARY
+        echo "- CSS: ${css_lines} lines" >> $GITHUB_STEP_SUMMARY
+
+        total=$((python_lines + js_lines + html_lines + css_lines))
+        echo "- **Total: ${total} lines**" >> $GITHUB_STEP_SUMMARY
+
+    - name: Check documentation completeness
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Documentation Status" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Check if documentation files have content
+        for file in README.md RULES.md CLAUDE.md; do
+          lines=$(wc -l < "$file")
+          echo "- $file: $lines lines" >> $GITHUB_STEP_SUMMARY
+        done
