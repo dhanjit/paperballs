@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paperballs - A Strategic Grid Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Paperballs</h1>
+            <p class="subtitle">A childhood game recreated</p>
+        </header>
+
+        <main>
+            <!-- Game Setup -->
+            <section id="setup" class="panel">
+                <h2>Game Setup</h2>
+                <div class="setup-controls">
+                    <label for="gridSize">Grid Size (N×N):</label>
+                    <select id="gridSize">
+                        <option value="3">3×3 (Quick)</option>
+                        <option value="4">4×4 (Medium)</option>
+                        <option value="5" selected>5×5 (Recommended)</option>
+                        <option value="6">6×6 (Long)</option>
+                        <option value="7">7×7 (Epic)</option>
+                    </select>
+                    <button id="startGame" class="btn btn-primary">Start Game</button>
+                </div>
+            </section>
+
+            <!-- Game Info -->
+            <section id="gameInfo" class="panel" style="display: none;">
+                <div class="info-row">
+                    <div class="player-info player-1">
+                        <h3>Player 1 (X)</h3>
+                        <div id="player1Status" class="status"></div>
+                    </div>
+                    <div class="phase-info">
+                        <h3 id="phaseDisplay">Phase: Placement</h3>
+                        <p id="turnDisplay">Player 1's turn</p>
+                        <p id="instructionDisplay" class="instruction">Click any empty vertex to place your ball</p>
+                    </div>
+                    <div class="player-info player-2">
+                        <h3>Player 2 (O)</h3>
+                        <div id="player2Status" class="status"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Game Board -->
+            <section id="gameBoard" class="panel" style="display: none;">
+                <svg id="gameSvg" width="600" height="600"></svg>
+            </section>
+
+            <!-- Game Controls -->
+            <section id="gameControls" class="panel" style="display: none;">
+                <button id="newGame" class="btn btn-secondary">New Game</button>
+                <button id="resetGame" class="btn btn-secondary">Reset Current Game</button>
+            </section>
+
+            <!-- Rules -->
+            <section id="rules" class="panel">
+                <h2>How to Play</h2>
+                <div class="rules-content">
+                    <div class="rule-section">
+                        <h3>📍 Phase 1: Placement</h3>
+                        <p>Players take turns placing their balls on empty vertices of the grid. Continue until all balls are placed.</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🔄 Phase 2: Movement</h3>
+                        <p>Players take turns moving one ball to an adjacent empty vertex. Adjacent means connected by a grid line (horizontal, vertical, or diagonal).</p>
+                        <ul>
+                            <li>Cannot jump over any balls</li>
+                            <li>Cannot capture opponent's balls</li>
+                            <li>Must move each turn</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🏆 Victory</h3>
+                        <p>Form a straight line (horizontal, vertical, or diagonal) with all N of your balls to win!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ | <a href="https://dhanjit.me" target="_blank">dhanjit.me</a></p>
+            <p><a href="https://github.com/dhanjit/paperballs" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
