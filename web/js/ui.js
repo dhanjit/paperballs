@@ -47,10 +47,11 @@ class PaperballsUI {
     }
 
     /**
-     * Draw grid lines
+     * Draw grid lines based on diagonal mode
      */
     drawGridLines() {
         const n = this.game.n;
+        const diagonalMode = this.game.diagonalMode;
 
         // Horizontal lines
         for (let row = 0; row < n; row++) {
@@ -76,34 +77,67 @@ class PaperballsUI {
             this.svg.appendChild(line);
         }
 
-        // Diagonal lines (top-left to bottom-right)
-        for (let i = 0; i < n - 1; i++) {
-            for (let j = 0; j < n - 1; j++) {
-                const { x: x1, y: y1 } = this.gridToSvg(i, j);
-                const { x: x2, y: y2 } = this.gridToSvg(i + 1, j + 1);
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('class', 'grid-line');
-                this.svg.appendChild(line);
+        // Short diagonal lines (if mode is 'short' or 'all')
+        if (diagonalMode === 'short' || diagonalMode === 'all') {
+            // Diagonal lines (top-left to bottom-right)
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - 1; j++) {
+                    const { x: x1, y: y1 } = this.gridToSvg(i, j);
+                    const { x: x2, y: y2 } = this.gridToSvg(i + 1, j + 1);
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('class', 'grid-line');
+                    this.svg.appendChild(line);
+                }
+            }
+
+            // Diagonal lines (top-right to bottom-left)
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 1; j < n; j++) {
+                    const { x: x1, y: y1 } = this.gridToSvg(i, j);
+                    const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('class', 'grid-line');
+                    this.svg.appendChild(line);
+                }
             }
         }
 
-        // Diagonal lines (top-right to bottom-left)
-        for (let i = 0; i < n - 1; i++) {
-            for (let j = 1; j < n; j++) {
-                const { x: x1, y: y1 } = this.gridToSvg(i, j);
-                const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('class', 'grid-line');
-                this.svg.appendChild(line);
-            }
+        // Long diagonal and orthogonal lines (if mode is 'all')
+        if (diagonalMode === 'all') {
+            const longLineClass = 'grid-line grid-line-long';
+
+            // Main diagonals (corner to corner)
+            // Top-left to bottom-right
+            const { x: tl_x, y: tl_y } = this.gridToSvg(0, 0);
+            const { x: br_x, y: br_y } = this.gridToSvg(n - 1, n - 1);
+            const diagonal1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            diagonal1.setAttribute('x1', tl_x);
+            diagonal1.setAttribute('y1', tl_y);
+            diagonal1.setAttribute('x2', br_x);
+            diagonal1.setAttribute('y2', br_y);
+            diagonal1.setAttribute('class', longLineClass);
+            diagonal1.setAttribute('stroke-dasharray', '5,5');
+            this.svg.appendChild(diagonal1);
+
+            // Top-right to bottom-left
+            const { x: tr_x, y: tr_y } = this.gridToSvg(0, n - 1);
+            const { x: bl_x, y: bl_y } = this.gridToSvg(n - 1, 0);
+            const diagonal2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            diagonal2.setAttribute('x1', tr_x);
+            diagonal2.setAttribute('y1', tr_y);
+            diagonal2.setAttribute('x2', bl_x);
+            diagonal2.setAttribute('y2', bl_y);
+            diagonal2.setAttribute('class', longLineClass);
+            diagonal2.setAttribute('stroke-dasharray', '5,5');
+            this.svg.appendChild(diagonal2);
         }
     }
 

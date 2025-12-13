@@ -18,14 +18,24 @@
             <section id="setup" class="panel">
                 <h2>Game Setup</h2>
                 <div class="setup-controls">
-                    <label for="gridSize">Grid Size (N×N):</label>
-                    <select id="gridSize">
-                        <option value="3">3×3 (Quick)</option>
-                        <option value="4">4×4 (Medium)</option>
-                        <option value="5" selected>5×5 (Recommended)</option>
-                        <option value="6">6×6 (Long)</option>
-                        <option value="7">7×7 (Epic)</option>
-                    </select>
+                    <div class="setup-option">
+                        <label for="gridSize">Grid Size (N×N):</label>
+                        <select id="gridSize">
+                            <option value="3">3×3 (Quick)</option>
+                            <option value="4">4×4 (Medium)</option>
+                            <option value="5" selected>5×5 (Recommended)</option>
+                            <option value="6">6×6 (Long)</option>
+                            <option value="7">7×7 (Epic)</option>
+                        </select>
+                    </div>
+                    <div class="setup-option">
+                        <label for="diagonalMode">Diagonal Lines:</label>
+                        <select id="diagonalMode">
+                            <option value="none">No Diagonals (4-way)</option>
+                            <option value="short" selected>Short Diagonals (8-way)</option>
+                            <option value="all">All Diagonals</option>
+                        </select>
+                    </div>
                     <button id="startGame" class="btn btn-primary">Start Game</button>
                 </div>
             </section>

@@ -10,7 +10,9 @@ let ui = null;
  */
 function initGame() {
     const gridSize = parseInt(document.getElementById('gridSize').value);
-    game = new PaperballsGame(gridSize);
+    const diagonalMode = document.getElementById('diagonalMode').value;
+
+    game = new PaperballsGame(gridSize, diagonalMode);
     ui = new PaperballsUI(game);
 
     // Show game sections
