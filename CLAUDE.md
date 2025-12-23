@@ -77,6 +77,20 @@ Claude designed the overall project structure:
 - Included technical insights and lessons learned
 - Made it publication-ready for dhanjit.me
 
+### 6. CI/CD and Workflow Infrastructure
+
+**GitHub Actions Workflows:**
+- Created comprehensive CI/CD pipeline
+- Set up automated testing and validation
+- Configured GitHub Pages deployment
+- Implemented release automation
+
+**Git Workflow Documentation:**
+- Documented feature branch workflow (one branch per feature)
+- Established branch naming conventions (`claude/*`)
+- Integrated CI validation with feature branches
+- Created best practices guide for ongoing development
+
 ---
 
 ## What Claude Did NOT Do
@@ -171,6 +185,331 @@ Claude: Committed code to git
 Claude: Pushed to repository
 Human: Will deploy to production
 ```
+
+---
+
+## Git Workflow and Feature Branches
+
+### One Branch Per Feature Approach
+
+Starting from December 2025, this project follows a **one branch per feature** development workflow. This approach provides significant benefits for ongoing development and maintenance.
+
+**Benefits:**
+- **Isolated Development:** Each feature develops independently without affecting others
+- **Clean History:** Clear commit history per feature makes understanding changes easier
+- **Easy Rollback:** Can revert specific features without impacting others
+- **Parallel Work:** Multiple features can be developed concurrently across sessions
+- **CI Validation:** Each feature gets validated independently before merging
+- **Code Review:** Clear scope for reviewing specific changes
+
+### Branch Naming Convention
+
+All Claude-developed feature branches follow this pattern:
+```
+claude/<descriptive-name>-<session-id>
+```
+
+**Examples:**
+- `claude/add-ai-opponent-Xk3pQ`
+- `claude/fix-movement-bug-Zt9wR`
+- `claude/analyze-features-update-docs-Yrpnn` (current branch)
+
+**Components:**
+1. **Prefix:** `claude/` - Identifies AI-developed branches
+2. **Description:** Short, kebab-case feature description (e.g., `add-tutorial-system`)
+3. **Session ID:** Unique identifier for the development session (e.g., `Ab7cD`)
+
+**Why This Convention?**
+- Clearly distinguishes Claude's branches from human-created branches
+- Makes it easy to find all AI-developed features
+- Session ID prevents conflicts across different development sessions
+- Descriptive names make purpose clear without needing to read commits
+
+### Feature Branch Workflow
+
+**Phase 1: Branch Creation**
+```bash
+# Claude creates a new branch for each feature/task
+git checkout -b claude/add-tutorial-system-Ab7cD
+```
+
+**Phase 2: Development**
+```bash
+# Develop the feature with focused, atomic commits
+git add <files>
+git commit -m "Add tutorial UI components"
+git commit -m "Implement tutorial logic and state management"
+git commit -m "Add tests for tutorial system"
+```
+
+**Phase 3: Push to Remote**
+```bash
+# Push to remote repository with upstream tracking
+git push -u origin claude/add-tutorial-system-Ab7cD
+```
+
+**Phase 4: CI Validation**
+- Every push to `claude/*` branches automatically triggers CI workflow
+- Validates Python syntax and linting (cli/)
+- Checks JavaScript code quality (web/js/)
+- Verifies HTML structure (web/*.html)
+- Tests basic functionality
+- See `.github/workflows/ci.yml:12` for CI trigger configuration
+
+**Phase 5: Pull Request**
+```bash
+# Create PR using GitHub CLI
+gh pr create --title "Add tutorial system for new players" \
+  --body "Implements interactive tutorial with step-by-step guidance"
+```
+
+**Phase 6: Review and Merge**
+- Human reviews the changes
+- CI must pass before merge is allowed
+- After approval, merge to main branch
+- Feature branch can be deleted after successful merge
+
+### Development Patterns
+
+**Single Feature Development:**
+```
+main → claude/feature-abc123 → [CI validates] → PR → Review → Merge → main
+```
+
+**Parallel Features (Multiple Sessions):**
+```
+main ┬→ claude/add-ai-opponent-Abc → [CI] → PR → main
+     ├→ claude/fix-ui-bug-Def → [CI] → PR → main
+     └→ claude/update-docs-Ghi → [CI] → PR → main
+```
+
+Each feature is developed independently, validated by CI, and merged through separate pull requests. This allows for:
+- Bug fixes to be merged quickly while large features are still in development
+- Documentation updates independent of code changes
+- Experimental features that can be abandoned without affecting main
+
+### CI Integration
+
+The CI workflow (`.github/workflows/ci.yml`) automatically runs on:
+- All pushes to `claude/*` branches
+- All pushes to `main` and `develop` branches
+- All pull requests regardless of source branch
+
+**What CI Validates:**
+
+| Check | Purpose | Files Validated |
+|-------|---------|----------------|
+| Python Syntax | Ensures code runs without syntax errors | `cli/*.py` |
+| Python Linting | Catches critical issues (unused vars, undefined names) | `cli/*.py` |
+| JavaScript Syntax | Validates JS code quality | `web/js/*.js` |
+| HTML Structure | Checks HTML validity | `web/*.html` |
+| Documentation | Verifies critical files exist | `*.md` files |
+| CLI Test | Tests basic game initialization | `cli/paperballs.py` |
+
+**CI Status Indicators:**
+- ✅ **Green Check:** All validations passed, safe to merge
+- ❌ **Red X:** Validation failed, needs fixes before merge
+- 🟡 **Yellow Dot:** CI is running, wait for results
+
+This ensures every feature branch maintains code quality before merging to main.
+
+### Best Practices for Feature Branches
+
+**Do's:**
+✅ **One feature per branch** - Keep scope focused and clear
+✅ **Descriptive branch names** - Make purpose obvious
+✅ **Atomic commits** - Each commit represents a logical unit of change
+✅ **Push regularly** - Backup work and trigger CI early
+✅ **Wait for CI** - Don't request review until CI passes
+✅ **Clear commit messages** - Explain what and why, not just what
+
+**Don'ts:**
+❌ **Don't mix unrelated changes** - Keep bug fixes separate from features
+❌ **Don't develop on main** - Always use a feature branch
+❌ **Don't force push** - Especially to shared/review branches
+❌ **Don't merge without CI** - CI failures indicate real problems
+❌ **Don't skip descriptions** - PRs need context for reviewers
+
+### Typical Feature Branch Lifecycle: Real Example
+
+**Current Branch:** `claude/analyze-features-update-docs-Yrpnn`
+
+**Purpose:** Analyze feature branch workflow and update CLAUDE.md with documentation
+
+**Timeline:**
+1. ✅ **Created:** Branch created for documentation task
+2. ✅ **Explored:** Analyzed existing workflow files and documentation
+3. 🔄 **Developing:** Currently updating CLAUDE.md with comprehensive workflow documentation
+4. ⬜ **Push:** Will push changes to remote
+5. ⬜ **CI:** Will wait for CI validation to pass
+6. ⬜ **PR:** Will create pull request for human review
+7. ⬜ **Merge:** After approval, merge to main
+
+**This Branch Demonstrates:**
+- Clear, descriptive naming convention
+- Single responsibility (documentation update only)
+- Isolated from other work
+- Will go through full CI validation
+- Transparent process documentation
+
+### Concurrent Feature Development
+
+Claude can work on multiple features across different sessions, each in its own branch:
+
+**Scenario: Three Parallel Features**
+
+**Session 1 - Major Feature:**
+- **Branch:** `claude/add-ai-opponent-Abc123`
+- **Status:** In progress, complex implementation
+- **Timeline:** Multiple days, not yet merged
+- **Impact:** Large, needs thorough testing
+
+**Session 2 - Quick Fix:**
+- **Branch:** `claude/fix-movement-validation-Def456`
+- **Status:** Bug fix, ready for review
+- **Timeline:** Single session, can merge immediately
+- **Impact:** Small, critical bug fix
+
+**Session 3 - Documentation:**
+- **Branch:** `claude/update-api-docs-Ghi789`
+- **Status:** Documentation improvements
+- **Timeline:** Single session, low risk
+- **Impact:** No code changes, safe to merge
+
+Each branch develops independently. The bug fix can be merged to production while the AI opponent feature continues development. No conflicts, no blockers.
+
+### Git Push Practices
+
+**Standard Push:**
+```bash
+# First push of a new branch
+git push -u origin claude/feature-name-Xyz123
+
+# Subsequent pushes
+git push
+```
+
+**Network Resilience:**
+Claude implements automatic retry logic for network failures:
+- Retry up to 4 times with exponential backoff
+- Wait times: 2s, 4s, 8s, 16s
+- Only retry on network errors (not authentication or validation errors)
+
+**Critical Requirements:**
+- Branch MUST start with `claude/`
+- Branch MUST include session ID
+- Failure to follow naming convention results in 403 error
+
+**Fetch/Pull Best Practices:**
+```bash
+# Prefer fetching specific branches
+git fetch origin claude/feature-name-Xyz123
+
+# Pull with explicit branch specified
+git pull origin claude/feature-name-Xyz123
+
+# Update main branch
+git fetch origin main
+git checkout main
+git pull origin main
+```
+
+### Integration with Release Process
+
+Feature branches integrate seamlessly with the release workflow:
+
+**Development Flow:**
+1. **Features Merged to Main** → Accumulates changes for next release
+2. **Main Branch Updated** → Auto-deploys web version to GitHub Pages
+3. **Version Tag Created** (e.g., `v1.1.0`) → Triggers release workflow
+4. **Automated Release** → Packages and publishes to GitHub Releases
+
+**Example Timeline:**
+```
+v1.0.0 released
+   ↓
+claude/add-tutorial-system → merged to main
+claude/fix-ui-bug → merged to main
+claude/improve-ai → merged to main
+   ↓
+v1.1.0 released (includes all three features)
+```
+
+See `RELEASE.md` for detailed release process documentation.
+
+### Monitoring Feature Branches
+
+**View All Branches:**
+```bash
+# Local branches only
+git branch
+
+# Remote branches only
+git branch -r
+
+# All branches (local + remote)
+git branch -a
+
+# Filter Claude's branches
+git branch -r | grep claude/
+
+# Filter by feature type
+git branch -r | grep claude/add-
+git branch -r | grep claude/fix-
+```
+
+**Check CI Status:**
+- Visit: `https://github.com/dhanjit/paperballs/actions`
+- Filter by branch name to see specific feature CI runs
+- Review workflow runs and detailed results
+- Download logs if troubleshooting needed
+
+**Monitor PR Status:**
+```bash
+# List all open PRs (requires gh CLI)
+gh pr list
+
+# Check status of specific PR
+gh pr status
+
+# View PR details
+gh pr view <number>
+```
+
+### Why This Workflow Works
+
+**For the Project:**
+- ✅ **Stable Main Branch:** Main always contains working, tested code
+- ✅ **Risk Management:** Experimental features don't break production
+- ✅ **Clear Audit Trail:** Every change traceable to specific feature
+- ✅ **Easy Rollback:** Can revert specific features if issues found
+
+**For Claude (AI Development):**
+- ✅ **Isolated Context:** Each session has its own working environment
+- ✅ **Parallel Capability:** Can work on multiple features concurrently
+- ✅ **Early Validation:** CI catches errors before human review
+- ✅ **Clear Scope:** Session boundaries match branch boundaries
+
+**For Human Maintainers:**
+- ✅ **Manageable Reviews:** Review one feature at a time
+- ✅ **Independent Decisions:** Approve/reject features independently
+- ✅ **Understand Impact:** Clear scope of what each PR changes
+- ✅ **Flexible Prioritization:** Merge urgent fixes without waiting for large features
+
+### Future Workflow Enhancements
+
+**Planned Improvements:**
+- **Automated PR Creation:** Auto-create PR when feature branch pushed
+- **Enhanced CI Checks:** Add test coverage, performance benchmarks
+- **Branch Protection:** Require reviews and CI pass before merge
+- **Automated Cleanup:** Delete merged feature branches automatically
+- **Release Notes:** Auto-generate from merged feature branches
+
+**Long-term Vision:**
+- Multiple AI instances working on different features simultaneously
+- Automated conflict resolution for independent changes
+- AI-driven code review suggestions
+- Predictive CI (catch issues before commit)
 
 ---
 
@@ -418,11 +757,11 @@ The result is a complete, well-documented, multi-platform game developed in a fr
 
 ---
 
-**Version:** 1.0
+**Version:** 1.1
 **Last Updated:** December 2025
-**Claude Model:** Claude 3.5 Sonnet
-**Development Time:** Single session
-**Files Created:** 16
+**Claude Model:** Claude 3.5 Sonnet (Initial), Claude Sonnet 4.5 (Workflow Documentation)
+**Development Time:** Single session (initial), ongoing (enhancements)
+**Files Created:** 16+
 **Lines of Code:** ~2,900+
 
 ---
