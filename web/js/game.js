@@ -3,12 +3,13 @@
  */
 
 class PaperballsGame {
-    constructor(n = 5) {
+    constructor(n = 5, diagonalMode = 'short') {
         if (n < 3) {
             throw new Error("Grid size must be at least 3");
         }
 
         this.n = n;
+        this.diagonalMode = diagonalMode; // 'none', 'short', 'all'
         this.grid = Array(n).fill(null).map(() => Array(n).fill(null));
         this.currentPlayer = 1;
         this.phase = "placement"; // "placement" or "movement"
@@ -33,14 +34,44 @@ class PaperballsGame {
     }
 
     /**
-     * Get all adjacent positions (8 directions)
+     * Get all adjacent positions based on diagonal mode
      */
     getAdjacentPositions(row, col) {
-        const directions = [
-            [-1, -1], [-1, 0], [-1, 1],
-            [0, -1],           [0, 1],
-            [1, -1],  [1, 0],  [1, 1]
+        let directions = [];
+
+        // Orthogonal directions (always included)
+        const orthogonal = [
+            [-1, 0], // up
+            [0, -1], // left
+            [0, 1],  // right
+            [1, 0]   // down
         ];
+
+        // Short diagonal directions
+        const shortDiagonal = [
+            [-1, -1], // up-left
+            [-1, 1],  // up-right
+            [1, -1],  // down-left
+            [1, 1]    // down-right
+        ];
+
+        // Add directions based on diagonal mode
+        if (this.diagonalMode === 'none') {
+            // Only orthogonal (4-way)
+            directions = orthogonal;
+        } else if (this.diagonalMode === 'short') {
+            // Orthogonal + short diagonals (8-way)
+            directions = [...orthogonal, ...shortDiagonal];
+        } else if (this.diagonalMode === 'all') {
+            // Orthogonal + all diagonals (short + long)
+            directions = [...orthogonal, ...shortDiagonal];
+
+            // Add long diagonals
+            for (let i = 2; i < this.n; i++) {
+                directions.push([-i, -i], [-i, i], [i, -i], [i, i]); // long diagonals
+                directions.push([-i, 0], [i, 0], [0, -i], [0, i]);   // long orthogonals
+            }
+        }
 
         return directions
             .map(([dr, dc]) => [row + dr, col + dc])
