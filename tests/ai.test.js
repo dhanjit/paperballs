@@ -162,10 +162,11 @@ describe('PaperballsAI', () => {
             // Setup: AI can move to complete winning horizontal line
             // Row 0: [2, 2, null], AI has ball at [0,1] that can move to [0,2]
             // Or ball at [1,2] can move to [0,2]
+            // Player 1 has balls at [1,0], [2,0], [2,1] to make this a valid movement phase
             game.grid = [
                 [2, 2, null],
-                [null, null, 2],
-                [null, null, null]
+                [1, null, 2],
+                [1, 1, null]
             ];
             game.phase = 'movement';
             game.currentPlayer = 2;

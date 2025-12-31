@@ -100,6 +100,20 @@ class PaperballsAI {
                 move.toRow,
                 move.toCol
             );
+
+            // Check if this move immediately wins
+            const immediateWin = this.checkWinnerFromState(simulated);
+            if (immediateWin === this.aiPlayer) {
+                // Immediate win - return this move right away
+                return {
+                    type: 'move',
+                    fromRow: move.fromRow,
+                    fromCol: move.fromCol,
+                    toRow: move.toRow,
+                    toCol: move.toCol
+                };
+            }
+
             const score = this.minimax(simulated, this.maxDepth - 1, -Infinity, Infinity, false);
 
             if (score > bestScore) {
@@ -132,6 +146,17 @@ class PaperballsAI {
         const winner = this.checkWinnerFromState(gameState);
         if (winner === this.aiPlayer) return 1000000;
         if (winner === this.opponent) return -1000000;
+
+        // Check for no-moves condition (immobilization) in movement phase
+        if (gameState.phase === 'movement') {
+            const currentPlayer = maximizingPlayer ? this.aiPlayer : this.opponent;
+            const moves = this.getAllPossibleMoves(gameState, currentPlayer);
+            if (moves.length === 0) {
+                // Current player has no moves - they lose
+                return maximizingPlayer ? -1000000 : 1000000;
+            }
+        }
+
         if (depth === 0) return this.evaluate(gameState);
 
         const currentPlayer = maximizingPlayer ? this.aiPlayer : this.opponent;
@@ -232,30 +257,31 @@ class PaperballsAI {
         // Evaluate all lines for threats and opportunities
         const n = gameState.n;
         const grid = gameState.grid;
+        const k = gameState.winLineLength || n;
 
         // Check all horizontal lines
         for (let row = 0; row < n; row++) {
             const positions = Array.from({ length: n }, (_, col) => [row, col]);
-            score += this.evaluateLine(grid, positions, this.aiPlayer);
-            score -= this.evaluateLine(grid, positions, this.opponent);
+            score += this.evaluateLine(grid, positions, this.aiPlayer, k);
+            score -= this.evaluateLine(grid, positions, this.opponent, k);
         }
 
         // Check all vertical lines
         for (let col = 0; col < n; col++) {
             const positions = Array.from({ length: n }, (_, row) => [row, col]);
-            score += this.evaluateLine(grid, positions, this.aiPlayer);
-            score -= this.evaluateLine(grid, positions, this.opponent);
+            score += this.evaluateLine(grid, positions, this.aiPlayer, k);
+            score -= this.evaluateLine(grid, positions, this.opponent, k);
         }
 
         // Check main diagonal
         const diagonal1 = Array.from({ length: n }, (_, i) => [i, i]);
-        score += this.evaluateLine(grid, diagonal1, this.aiPlayer);
-        score -= this.evaluateLine(grid, diagonal1, this.opponent);
+        score += this.evaluateLine(grid, diagonal1, this.aiPlayer, k);
+        score -= this.evaluateLine(grid, diagonal1, this.opponent, k);
 
         // Check anti-diagonal
         const diagonal2 = Array.from({ length: n }, (_, i) => [i, n - 1 - i]);
-        score += this.evaluateLine(grid, diagonal2, this.aiPlayer);
-        score -= this.evaluateLine(grid, diagonal2, this.opponent);
+        score += this.evaluateLine(grid, diagonal2, this.aiPlayer, k);
+        score -= this.evaluateLine(grid, diagonal2, this.opponent, k);
 
         // Add positional bonuses
         score += this.evaluatePosition(gameState);
@@ -264,40 +290,58 @@ class PaperballsAI {
     }
 
     /**
-     * Evaluate a single line for a player
+     * Evaluate a single line for a player using sliding window for K-in-a-row
      */
-    evaluateLine(grid, positions, player) {
-        let count = 0;
-        let emptyCount = 0;
+    evaluateLine(grid, positions, player, winLineLength) {
+        let maxScore = 0;
 
-        for (const [row, col] of positions) {
-            if (grid[row][col] === player) {
-                count++;
-            } else if (grid[row][col] === null) {
-                emptyCount++;
-            } else {
-                // Line is blocked by opponent
-                return 0;
+        // Check each possible K-length window
+        for (let start = 0; start <= positions.length - winLineLength; start++) {
+            const window = positions.slice(start, start + winLineLength);
+
+            let count = 0;
+            let emptyCount = 0;
+            let blocked = false;
+
+            for (const [row, col] of window) {
+                if (grid[row][col] === player) {
+                    count++;
+                } else if (grid[row][col] === null) {
+                    emptyCount++;
+                } else {
+                    // Window is blocked by opponent
+                    blocked = true;
+                    break;
+                }
             }
+
+            if (blocked) continue;
+
+            // Score this window based on progress toward K-in-a-row
+            let windowScore = 0;
+            const k = winLineLength;
+
+            if (count === k) {
+                // Actual win (should never happen as it would be terminal)
+                windowScore = 1000000;
+            } else if (count === k - 1 && emptyCount === 1) {
+                // One move away from winning
+                windowScore = 50000;
+            } else if (count === k - 2 && emptyCount === 2) {
+                // Two moves away from winning
+                windowScore = 1000;
+            } else if (count === k - 3 && emptyCount === 3) {
+                // Three moves away
+                windowScore = 100;
+            } else if (count > 0 && emptyCount + count === k) {
+                // Some progress in this window
+                windowScore = count * 10;
+            }
+
+            maxScore = Math.max(maxScore, windowScore);
         }
 
-        // Score based on number of balls in line
-        const n = positions.length;
-        if (count === n - 1 && emptyCount === 1) {
-            // One move away from winning
-            return 50000;
-        } else if (count === n - 2 && emptyCount === 2) {
-            // Two moves away from winning
-            return 1000;
-        } else if (count === n - 3 && emptyCount === 3) {
-            // Three moves away
-            return 100;
-        } else if (count > 0 && emptyCount + count === n) {
-            // Some progress on this line
-            return count * 10;
-        }
-
-        return 0;
+        return maxScore;
     }
 
     /**
@@ -466,43 +510,62 @@ class PaperballsAI {
             phase: gameState.phase,
             ballsPlaced: { ...gameState.ballsPlaced },
             ballsPerPlayer: gameState.ballsPerPlayer,
-            diagonalMode: gameState.diagonalMode
+            diagonalMode: gameState.diagonalMode,
+            winLineLength: gameState.winLineLength
         };
     }
 
     /**
+     * Check if K consecutive positions in a line contain the player's ball
+     * Uses sliding window algorithm to check all possible K-length subsequences
+     */
+    checkLineForKConsecutive(grid, positions, player, k) {
+        // Check each K-length subsequence for consecutive player balls
+        for (let start = 0; start <= positions.length - k; start++) {
+            const window = positions.slice(start, start + k);
+            const hasKConsecutive = window.every(([r, c]) => grid[r][c] === player);
+            if (hasKConsecutive) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Check winner from a game state
+     * Checks for K consecutive balls in a row (K = winLineLength)
      */
     checkWinnerFromState(gameState) {
         const n = gameState.n;
         const grid = gameState.grid;
+        const k = gameState.winLineLength || n; // Default to N if not specified
 
         for (let player of [1, 2]) {
-            // Check horizontal lines
+            // Check horizontal lines (each row)
             for (let row = 0; row < n; row++) {
                 const positions = Array.from({ length: n }, (_, col) => [row, col]);
-                if (this.checkLine(grid, positions, player)) {
+                if (this.checkLineForKConsecutive(grid, positions, player, k)) {
                     return player;
                 }
             }
 
-            // Check vertical lines
+            // Check vertical lines (each column)
             for (let col = 0; col < n; col++) {
                 const positions = Array.from({ length: n }, (_, row) => [row, col]);
-                if (this.checkLine(grid, positions, player)) {
+                if (this.checkLineForKConsecutive(grid, positions, player, k)) {
                     return player;
                 }
             }
 
-            // Check diagonal (top-left to bottom-right)
+            // Check main diagonal (top-left to bottom-right)
             const diagonal1 = Array.from({ length: n }, (_, i) => [i, i]);
-            if (this.checkLine(grid, diagonal1, player)) {
+            if (this.checkLineForKConsecutive(grid, diagonal1, player, k)) {
                 return player;
             }
 
-            // Check diagonal (top-right to bottom-left)
+            // Check anti-diagonal (top-right to bottom-left)
             const diagonal2 = Array.from({ length: n }, (_, i) => [i, n - 1 - i]);
-            if (this.checkLine(grid, diagonal2, player)) {
+            if (this.checkLineForKConsecutive(grid, diagonal2, player, k)) {
                 return player;
             }
         }
@@ -512,6 +575,7 @@ class PaperballsAI {
 
     /**
      * Check if all positions in a line contain the player's ball
+     * @deprecated Use checkLineForKConsecutive() instead
      */
     checkLine(grid, positions, player) {
         return positions.every(([r, c]) => grid[r][c] === player);

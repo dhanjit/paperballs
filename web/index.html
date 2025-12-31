@@ -40,6 +40,13 @@
                         </select>
                     </div>
                     <div class="setup-option">
+                        <label for="winLineLength">Win Condition:</label>
+                        <select id="winLineLength">
+                            <option value="auto" selected>N-in-a-row (Classic)</option>
+                            <!-- Dynamic options added by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="setup-option">
                         <label for="gameMode">Game Mode:</label>
                         <select id="gameMode">
                             <option value="pvp" selected>Player vs Player</option>
@@ -107,7 +114,9 @@
                     </div>
                     <div class="rule-section">
                         <h3>🏆 Victory</h3>
-                        <p>Form a straight line (horizontal, vertical, or diagonal) with all N of your balls to win!</p>
+                        <p>Form K consecutive balls in a straight line (horizontal, vertical, or diagonal) to win!</p>
+                        <p><em>K is configurable in game setup (default: N-in-a-row for N×N grid)</em></p>
+                        <p><strong>New:</strong> If your opponent has no valid moves, you win immediately!</p>
                     </div>
                 </div>
             </section>
@@ -128,6 +137,31 @@
         document.getElementById('gameMode').addEventListener('change', (e) => {
             const difficultyOption = document.getElementById('difficultyOption');
             difficultyOption.style.display = e.target.value === 'pvai' ? 'block' : 'none';
+        });
+
+        // Update win line length options when grid size changes
+        function updateWinLineLengthOptions() {
+            const n = parseInt(document.getElementById('gridSize').value);
+            const winLengthSelect = document.getElementById('winLineLength');
+
+            // Clear current options
+            winLengthSelect.innerHTML = '<option value="auto" selected>N-in-a-row (Classic)</option>';
+
+            // Add options from 3 to N
+            for (let k = 3; k <= n; k++) {
+                const option = document.createElement('option');
+                option.value = k;
+                option.textContent = `${k}-in-a-row`;
+                winLengthSelect.appendChild(option);
+            }
+        }
+
+        // Listen for grid size changes
+        document.getElementById('gridSize').addEventListener('change', updateWinLineLengthOptions);
+
+        // Initialize options on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateWinLineLengthOptions();
         });
     </script>
 </body>
