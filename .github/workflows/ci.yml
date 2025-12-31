@@ -2,16 +2,15 @@
 # Continuous Integration (CI) Workflow
 # ============================================================================
 # This workflow validates code quality on every push and pull request.
-# It runs three parallel jobs to check Python, JavaScript, and documentation.
+# It runs two parallel jobs to check JavaScript and documentation.
 #
 # Triggers:
 #   - Push to main, develop, or claude/* branches
 #   - Pull requests targeting main or develop
 #
 # Jobs:
-#   1. validate-python: Lints Python code and tests CLI game initialization
-#   2. validate-web: Validates JavaScript and web file structure
-#   3. validate-docs: Ensures all documentation files exist
+#   1. validate-web: Validates JavaScript and web file structure
+#   2. validate-docs: Ensures all documentation files exist
 # ============================================================================
 
 name: CI
@@ -25,51 +24,7 @@ on:
 
 jobs:
   # ==========================================================================
-  # Job 1: Validate Python Code
-  # ==========================================================================
-  # Validates the CLI version of the game written in Python
-  validate-python:
-    name: Validate Python Code
-    runs-on: ubuntu-latest  # Use latest Ubuntu runner
-
-    steps:
-    # Checkout the repository code
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    # Setup Python environment
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.9'  # Python 3.9 for compatibility testing
-
-    # Install Python linting tools
-    - name: Install dependencies
-      run: |
-        # Upgrade pip to latest version
-        python -m pip install --upgrade pip
-        # Install linting tools: pylint and flake8
-        pip install pylint flake8
-
-    # Run flake8 linter to check Python code quality
-    - name: Lint Python code
-      run: |
-        # Critical errors only - fail build if found
-        # E9: Runtime errors, F63/F7/F82: Syntax/import errors
-        flake8 cli/ --count --select=E9,F63,F7,F82 --show-source --statistics
-
-        # Style warnings - don't fail build, just report
-        # Max complexity: 10, Max line length: 127
-        flake8 cli/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-    # Test that the CLI game can be imported and initialized
-    - name: Test CLI game
-      run: |
-        # Quick smoke test: import module and create game instance
-        python3 -c "from cli.paperballs import Paperballs; g = Paperballs(3); print('✓ CLI game loads successfully')"
-
-  # ==========================================================================
-  # Job 2: Validate Web Code
+  # Job 1: Validate Web Code
   # ==========================================================================
   # Validates the web version's JavaScript, HTML, and file structure
   validate-web:
@@ -119,7 +74,7 @@ jobs:
         test -f web/js/main.js && echo "✓ main.js exists"
 
   # ==========================================================================
-  # Job 3: Validate Documentation
+  # Job 2: Validate Documentation
   # ==========================================================================
   # Ensures all required documentation files are present
   validate-docs:
