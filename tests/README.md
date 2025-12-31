@@ -69,8 +69,8 @@ Tests for each mode:
 
 **Modes:**
 - `none`: 4 directions (orthogonal only)
-- `short`: 8 directions (orthogonal + short diagonals)
-- `all`: Many directions (all diagonal lines)
+- `main`: 4-8 directions (orthogonal + main diagonal lines only)
+- `short`: 8 directions (orthogonal + short diagonals everywhere)
 
 ### 4. Boundary Tests (40 tests)
 **Parameterized across 5 grid sizes (3×3, 4×4, 5×5, 6×6, 7×7)**

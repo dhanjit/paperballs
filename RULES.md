@@ -36,16 +36,13 @@ The grid can be configured with different diagonal connections:
 - Each vertex connects to up to 8 neighbors (orthogonal + diagonal)
 - Most common configuration, balanced gameplay
 
-**Option 3: All Diagonals**
-- Includes short diagonals PLUS long diagonals across the entire grid
-- More movement options and strategic complexity
-- Example: In a 5×5 grid, corners connect diagonally across the whole board
+**Option 3: Main Diagonals Only**
+- Includes ONLY the two main diagonal lines of the grid (top-left to bottom-right, top-right to bottom-left)
+- Diagonal movement restricted to positions on these main diagonals
+- Creates strategic "diagonal highways" across the board
+- Example: In a 5×5 grid, (0,0)→(1,1)→(2,2)→(3,3)→(4,4) and (0,4)→(1,3)→(2,2)→(3,1)→(4,0) allow diagonal movement
 
-**Option 4: Custom**
-- Select specific diagonal connections
-- Advanced configuration for experienced players
-
-**Recommendation:** Start with **Short Diagonals (Standard)** for your first games.
+**Recommendation:** Start with **Short Diagonals (8-way)** for your first games.
 
 ## Gameplay
 
@@ -191,17 +188,17 @@ The original game may have supported three players, but the exact rules for 3-pl
 ```
 Each vertex connects to 8 neighbors (or fewer at edges)
 
-### 3×3 Grid with All Diagonals
+### 3×3 Grid with Main Diagonals Only
 ```
-● ═ ● ═ ●
-║╲╳╱║
-║ ╳ ║
-● ═ ● ═ ●
-║╱╳╲║
-║ ╳ ║
-● ═ ● ═ ●
+● ─ ● ─ ●
+│ ╲ ╱ │
+│  ╳  │
+● ─ ● ─ ●
+│ ╱ ╲ │
+│  ╳  │
+● ─ ● ─ ●
 ```
-Includes long diagonals connecting opposite corners
+Only the two main diagonal lines (not all short diagonals)
 
 ### 3×3 Grid with No Diagonals
 ```
