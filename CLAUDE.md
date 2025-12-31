@@ -84,6 +84,39 @@ Claude designed the overall project structure:
 - Integrated CI validation with feature branches
 - Created best practices guide for ongoing development
 
+### 7. AI Opponent Implementation
+
+**Algorithm Design:**
+- Implemented Minimax algorithm with Alpha-Beta pruning
+- Created comprehensive evaluation heuristic for board positions
+- Designed three difficulty levels (Easy, Medium, Hard)
+
+**AI Features:**
+- Detects and executes winning moves
+- Blocks opponent winning opportunities
+- Strategic placement and movement decisions
+- Handles both placement and movement phases
+- Respects all game rules and diagonal modes
+
+**Technical Implementation:**
+- Created `web/js/ai.js` (~500 lines) with complete AI logic
+- Integrated game mode selector (PvP vs PvAI) in UI
+- Added AI turn execution with UX delay for better game feel
+- Updated game state to include diagonal mode for AI decision-making
+
+**Testing:**
+- Created 29 comprehensive AI tests in `tests/ai.test.js`
+- 97.5% code coverage on AI module
+- Tests for win detection, move validity, evaluation scoring
+- Integration tests for complete game flows
+- Parameterized tests across difficulty levels and diagonal modes
+
+**Performance Optimization:**
+- Alpha-Beta pruning reduces search space significantly
+- Depth-limited search based on difficulty (2/4/6 levels)
+- Efficient position evaluation with strategic heuristics
+- Fast enough for real-time gameplay on all grid sizes
+
 ---
 
 ## What Claude Did NOT Do
@@ -734,12 +767,12 @@ The result is a complete, well-documented, multi-platform game developed in a fr
 
 ---
 
-**Version:** 1.1
+**Version:** 1.2
 **Last Updated:** December 2025
-**Claude Model:** Claude 3.5 Sonnet (Initial), Claude Sonnet 4.5 (Workflow Documentation & UI Overhaul)
+**Claude Model:** Claude 3.5 Sonnet (Initial), Claude Sonnet 4.5 (Workflow, UI Overhaul, AI Opponent)
 **Development Time:** Multiple sessions
-**Files Created:** ~26
-**Lines of Code:** ~3,100+
+**Files Created:** ~28
+**Lines of Code:** ~4,100+
 
 ### Version 1.1 Updates
 
@@ -766,6 +799,33 @@ Implemented comprehensive automated testing with 90%+ code coverage:
 - **Branch Protection:** Main branch requires passing tests before merge
 - **Coverage:** 90% statements, 79% branches, 84% functions on game logic
 - **Documentation:** Complete test suite documentation in `tests/README.md`
+
+### Version 1.2 Updates
+
+**AI Opponent Implementation:**
+Added intelligent computer opponent using game theory algorithms:
+- **Algorithm:** Minimax with Alpha-Beta pruning for optimal move selection
+- **Difficulty Levels:** Three levels (Easy/Medium/Hard) with search depths 2/4/6
+- **Game Modes:** Player vs Player (PvP) and Player vs AI (PvAI)
+- **Intelligence:** Detects wins, blocks opponent threats, strategic positioning
+- **UI Integration:** Seamless game mode selector with difficulty options
+- **UX Polish:** 500ms AI thinking delay for natural game feel
+- **Performance:** Fast enough for real-time play on all grid sizes
+- **Code Quality:** ~500 lines of well-documented AI logic in `web/js/ai.js`
+
+**AI Testing:**
+Comprehensive test suite for AI functionality:
+- **29 AI Tests:** Covering move generation, evaluation, win detection
+- **97.5% Coverage:** Excellent code coverage on AI module (97.5% statements, 87.8% branches, 100% functions)
+- **Integration Tests:** Full game simulations with AI vs dummy opponent
+- **129 Total Tests:** Combined game logic + AI tests
+- **Overall Coverage:** 96.2% statements, 85.2% branches, 96.3% functions
+- **Test Performance:** Optimized with 3×3 grids and medium difficulty for fast execution
+
+**Game State Enhancement:**
+- Updated `game.js` to expose `diagonalMode` in state for AI decision-making
+- Maintains backward compatibility with existing game logic
+- No breaking changes to existing functionality
 
 ---
 

@@ -5,12 +5,16 @@ An interactive browser-based version of Paperballs.
 ## Features
 
 - ✅ Fully playable in any modern web browser
+- ✅ **Two game modes:** Player vs Player (PvP) and Player vs AI (PvAI)
+- ✅ **Intelligent AI opponent** with three difficulty levels
 - ✅ Interactive grid with visual feedback
 - ✅ Configurable grid sizes (3×3 to 7×7)
+- ✅ Three diagonal modes (none, short, all)
 - ✅ Clear game phases (placement and movement)
 - ✅ Move validation and highlighting
 - ✅ Winner detection and announcement
 - ✅ Responsive design for mobile and desktop
+- ✅ Beautiful notebook paper theme
 
 ## Technology Stack
 
@@ -21,9 +25,10 @@ An interactive browser-based version of Paperballs.
 
 ## Files
 
-- `index.html` - Main HTML structure
+- `index.html` - Main HTML structure with game mode selector
 - `css/style.css` - Styling and animations
-- `js/game.js` - Core game logic
+- `js/game.js` - Core game logic and rules engine
+- `js/ai.js` - AI opponent with Minimax algorithm
 - `js/ui.js` - UI rendering and management
 - `js/main.js` - Application entry point and event handling
 

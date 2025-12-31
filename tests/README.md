@@ -1,13 +1,16 @@
 # Paperballs Test Suite
 
-Comprehensive test suite for the Paperballs game, providing 90%+ coverage of core game logic.
+Comprehensive test suite for the Paperballs game, providing 96%+ coverage of core game logic and AI.
 
 ## Overview
 
-- **100 tests** across all game mechanics
-- **90%+ code coverage** on game logic
+- **129 tests** across all game mechanics and AI functionality
+- **96%+ code coverage** on game logic and AI
 - **Parameterized tests** for multiple grid sizes and diagonal modes
 - **CI integration** - tests run automatically on every push
+- **Two test suites:**
+  - `game.test.js` - 100 tests for core game logic
+  - `ai.test.js` - 29 tests for AI opponent
 
 ## Running Tests
 
@@ -30,9 +33,9 @@ npm run test:verbose
 ### Test Output
 
 ```
-Test Suites: 1 passed, 1 total
-Tests:       100 passed, 100 total
-Time:        ~0.15s
+Test Suites: 2 passed, 2 total
+Tests:       129 passed, 129 total
+Time:        ~0.26s
 ```
 
 ## Test Organization
@@ -98,20 +101,73 @@ For each grid size:
 - Multi-turn movement sequences
 - Error recovery and state consistency
 
+### 8. AI Tests (29 tests)
+
+**AI Initialization (3 tests)**
+- Difficulty level configuration
+- Search depth mapping (Easy: 2, Medium: 4, Hard: 6)
+- Player ID assignment
+
+**Move Generation - Placement Phase (3 tests)**
+- Valid placement move generation
+- Executable placement moves
+- Winning placement detection
+- Opponent blocking
+
+**Move Generation - Movement Phase (3 tests)**
+- Valid movement move generation
+- Executable movement moves
+- Winning movement detection
+
+**Evaluation Function (4 tests)**
+- Winning position evaluation (AI)
+- Losing position evaluation (opponent)
+- Near-win position scoring
+- Center position favorability
+
+**Adjacent Positions (3 tests)**
+- Diagonal mode adherence (none, short, all)
+- Grid boundary respect
+
+**Game State Simulation (3 tests)**
+- Non-mutating state cloning
+- Placement simulation
+- Movement simulation
+
+**Win Detection (4 tests)**
+- Horizontal win detection
+- Vertical win detection
+- Diagonal win detection
+- No winner scenarios
+
+**Integration Tests (3 tests)**
+- Full placement phase completion
+- Movement phase gameplay
+- Complete game without invalid moves
+
 ## Code Coverage
 
-### Current Coverage (game.js only)
+### Current Coverage (game.js + ai.js)
 
 | Metric     | Coverage | Threshold | Status |
 |------------|----------|-----------|--------|
-| Statements | 90.9%    | 85%       | ✅ Pass |
-| Branches   | 79.03%   | 75%       | ✅ Pass |
-| Functions  | 84%      | 80%       | ✅ Pass |
-| Lines      | 90%      | 85%       | ✅ Pass |
+| Statements | 96.19%   | 85%       | ✅ Pass |
+| Branches   | 85.2%    | 75%       | ✅ Pass |
+| Functions  | 96.29%   | 80%       | ✅ Pass |
+| Lines      | 95.68%   | 85%       | ✅ Pass |
+
+**Per-File Coverage:**
+
+| File     | Statements | Branches | Functions | Lines  |
+|----------|------------|----------|-----------|--------|
+| game.js  | 92.92%     | 80.64%   | 92%       | 92.22% |
+| ai.js    | 97.53%     | 87.85%   | 100%      | 97.15% |
 
 ### Coverage Details
 
 **Tested:**
+
+*Game Logic (game.js):*
 - ✅ Game initialization and configuration
 - ✅ Grid management and validation
 - ✅ Ball placement logic
@@ -121,11 +177,23 @@ For each grid size:
 - ✅ Player switching
 - ✅ Phase transitions
 - ✅ Error handling
+- ✅ Diagonal mode state exposure
+
+*AI Logic (ai.js):*
+- ✅ AI initialization with difficulty levels
+- ✅ Minimax algorithm with Alpha-Beta pruning
+- ✅ Position evaluation heuristics
+- ✅ Move generation (placement & movement)
+- ✅ Win detection and threat analysis
+- ✅ Game state simulation and cloning
+- ✅ Adjacent position calculation per diagonal mode
+- ✅ Strategic positioning and mobility scoring
 
 **Not tested (uncovered lines):**
-- Error constructor (line 8) - edge case
+- Error constructor (game.js line 8) - edge case
 - Some conditional branches in adjacency logic
-- getPlayerName function (lines 237-246) - utility function
+- getPlayerName function (game.js lines 237-246) - utility function
+- Few edge cases in AI evaluation (ai.js lines 56, 88, 152, 295-300)
 - UI and rendering code (ui.js, main.js) - requires DOM
 
 ### Why UI Code Isn't Tested
@@ -304,16 +372,17 @@ open coverage/lcov-report/index.html
 
 ## Test Statistics
 
-- **Total Tests:** 100
-- **Test Suites:** 1
-- **Parameterized Test Groups:** 5
+- **Total Tests:** 129 (100 game + 29 AI)
+- **Test Suites:** 2
+- **Parameterized Test Groups:** 6
 - **Grid Sizes Tested:** 3×3, 4×4, 5×5, 6×6, 7×7
 - **Diagonal Modes Tested:** none, short, all
-- **Average Test Runtime:** ~0.15 seconds
-- **Coverage:** 90% of game.js
+- **AI Difficulty Levels Tested:** Easy, Medium, Hard
+- **Average Test Runtime:** ~0.26 seconds
+- **Overall Coverage:** 96.19% statements, 85.2% branches
 
 ---
 
 **Last Updated:** December 2025
 **Framework:** Jest 30.2.0
-**Test File:** `tests/game.test.js`
+**Test Files:** `tests/game.test.js`, `tests/ai.test.js`

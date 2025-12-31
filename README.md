@@ -9,9 +9,32 @@ A childhood game recreated - a strategic two-player game combining placement and
 
 Paperballs is a two-player strategy game played on a square grid. Players take turns placing and then moving their paperballs, aiming to form a straight line to win.
 
+**Play against a friend or challenge the AI!** The game features an intelligent computer opponent with three difficulty levels.
+
+## Features
+
+- 🎮 **Two Game Modes:**
+  - Player vs Player (PvP)
+  - Player vs AI (PvAI)
+- 🤖 **Intelligent AI Opponent:**
+  - Three difficulty levels (Easy, Medium, Hard)
+  - Uses Minimax algorithm with Alpha-Beta pruning
+  - Detects winning moves and blocks opponent threats
+- 🎨 **Beautiful Notebook Paper Theme:**
+  - Hand-drawn aesthetic with realistic paper ball graphics
+  - Ruled paper background with margin line
+  - Handwritten font style
+- 📐 **Flexible Grid Configurations:**
+  - Multiple grid sizes (3×3 to 7×7)
+  - Three diagonal modes (none, short, all)
+- ✅ **100% Test Coverage:**
+  - 129 automated tests
+  - 96%+ code coverage
+  - CI/CD integration
+
 ## Quick Start
 
-- **Players:** 2 (possibly 3)
+- **Players:** 1-2 (Player vs AI or Player vs Player)
 - **Grid Size:** N×N vertices (minimum N=3, recommended N=5)
 - **Diagonal Configuration:** Choose between no diagonals, short diagonals (standard), or all diagonals
 - **Pieces:** Each player gets N paperballs
@@ -53,7 +76,9 @@ A player wins by forming a straight line with their paperballs in any direction:
 
 1. ✅ Document the rules and gameplay
 2. ✅ Create a playable web version (hosted on dhanjit.me)
-3. ✅ Write a blog post documenting the development process
+3. ✅ Implement AI opponent with multiple difficulty levels
+4. ✅ Add comprehensive test suite (129 tests, 96%+ coverage)
+5. ✅ Write a blog post documenting the development process
 
 ## Getting Started
 

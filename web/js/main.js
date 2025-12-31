@@ -4,6 +4,8 @@
 
 let game = null;
 let ui = null;
+let aiPlayer = null;  // AI opponent instance
+let gameMode = 'pvp'; // Current game mode: 'pvp' or 'pvai'
 
 /**
  * Initialize a new game
@@ -11,9 +13,18 @@ let ui = null;
 function initGame() {
     const gridSize = parseInt(document.getElementById('gridSize').value);
     const diagonalMode = document.getElementById('diagonalMode').value;
+    gameMode = document.getElementById('gameMode').value;
 
     game = new PaperballsGame(gridSize, diagonalMode);
     ui = new PaperballsUI(game);
+
+    // Initialize AI if needed
+    if (gameMode === 'pvai') {
+        const difficulty = document.getElementById('aiDifficulty').value;
+        aiPlayer = new PaperballsAI(difficulty);
+    } else {
+        aiPlayer = null;
+    }
 
     // Show game sections
     document.getElementById('gameInfo').style.display = 'block';
@@ -34,6 +45,11 @@ function setupBoardClickHandler() {
     const svg = document.getElementById('gameSvg');
 
     svg.addEventListener('click', (event) => {
+        // Prevent clicks during AI turn
+        if (game.currentPlayer === 2 && aiPlayer !== null) {
+            return;
+        }
+
         // Find the clicked vertex
         let target = event.target;
         while (target && target.tagName !== 'g') {
@@ -73,6 +89,11 @@ function handlePlacementClick(row, col) {
     if (result.success) {
         game.switchPlayer();
         ui.refresh();
+
+        // Check if AI should play
+        if (shouldTriggerAI()) {
+            executeAITurn();
+        }
     } else {
         showMessage(result.error);
     }
@@ -117,11 +138,75 @@ function handleMovementClick(row, col) {
             } else {
                 game.switchPlayer();
                 ui.refresh();
+
+                // Check if AI should play
+                if (shouldTriggerAI()) {
+                    executeAITurn();
+                }
             }
         } else {
             showMessage(result.error);
         }
     }
+}
+
+/**
+ * Check if AI should make a move
+ */
+function shouldTriggerAI() {
+    return gameMode === 'pvai' &&
+           game.currentPlayer === 2 &&
+           !game.winner &&
+           aiPlayer !== null;
+}
+
+/**
+ * Execute AI turn
+ */
+function executeAITurn() {
+    // Disable board interaction
+    const svg = document.getElementById('gameSvg');
+    svg.style.pointerEvents = 'none';
+
+    // Update UI to show AI thinking
+    const instruction = document.getElementById('instructionDisplay');
+    const originalInstruction = instruction.textContent;
+    instruction.textContent = '🤖 AI is thinking...';
+
+    // Get AI decision
+    const state = game.getState();
+    const move = aiPlayer.getMove(state);
+
+    // Execute move after delay (for UX)
+    setTimeout(() => {
+        if (move.type === 'place') {
+            const result = game.placeBall(move.row, move.col);
+            if (result.success) {
+                game.switchPlayer();
+                ui.refresh();
+
+                // Re-enable board for human player
+                svg.style.pointerEvents = 'auto';
+            }
+        } else if (move.type === 'move') {
+            game.selectBall(move.fromRow, move.fromCol);
+            const result = game.moveBall(move.toRow, move.toCol);
+            if (result.success) {
+                const winner = game.checkWinner();
+                if (winner) {
+                    game.winner = winner;
+                    ui.refresh();
+                    setTimeout(() => ui.showWinner(winner), 300);
+                } else {
+                    game.switchPlayer();
+                    ui.refresh();
+
+                    // Re-enable board
+                    svg.style.pointerEvents = 'auto';
+                }
+            }
+        }
+    }, 500); // 500ms delay for UX
 }
 
 /**
@@ -160,6 +245,8 @@ function newGame() {
 
         game = null;
         ui = null;
+        aiPlayer = null;
+        gameMode = 'pvp';
     }
 }
 
