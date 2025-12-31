@@ -36,16 +36,20 @@ An interactive browser-based version of Paperballs.
 
 ### Deployment
 
-#### Option 1: GitHub Pages
-```bash
-# Just push to GitHub and enable GitHub Pages
-git add .
-git commit -m "Add web version"
-git push
-# Enable GitHub Pages in repository settings
+#### Option 1: Play on dhanjit.me
+The game is deployed at:
+```
+https://dhanjit.me/paperballs/
 ```
 
-#### Option 2: Simple HTTP Server
+The dhanjit.me blog automatically integrates this game via a build script that:
+- During development: Copies from local `../paperballs/web` directory
+- In production: Downloads from GitHub master branch
+- Injects proper base href for path resolution
+
+See `dhanjit.me/scripts/download-paperballs.js` for implementation details.
+
+#### Option 2: Simple HTTP Server (Local Development)
 ```bash
 # Python 3
 python3 -m http.server 8000
@@ -56,27 +60,12 @@ npx http-server
 # Then visit http://localhost:8000
 ```
 
-#### Option 3: Deploy to dhanjit.me
-Simply copy all files in the `web/` directory to your web server.
-
-### Hosting on dhanjit.me
-
-To host on your website:
-
-1. **Upload files:**
-   ```bash
-   # Copy to your web server
-   scp -r web/* user@dhanjit.me:/var/www/html/paperballs/
-   ```
-
-2. **Access the game:**
-   Visit `https://dhanjit.me/paperballs/`
-
-3. **Optional - Add to your main site:**
-   Add a link from your homepage:
-   ```html
-   <a href="/paperballs/">Play Paperballs</a>
-   ```
+#### Option 3: Static Hosting
+Simply copy all files in the `web/` directory to any static web host:
+```bash
+# Example: Copy to your web server
+scp -r web/* user@yourserver.com:/var/www/html/paperballs/
+```
 
 ## Game Structure
 

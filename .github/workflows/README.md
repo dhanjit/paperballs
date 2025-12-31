@@ -11,11 +11,10 @@ This directory contains automated workflows for the Paperballs project.
 **Triggers:** Push to main/develop/claude/* branches, Pull Requests
 
 **What it does:**
-- Validates Python code (syntax, linting)
 - Validates JavaScript code
 - Checks HTML structure
 - Verifies documentation files exist
-- Tests CLI game initialization
+- Validates web file structure
 
 **Status Badge:**
 ```markdown
@@ -30,7 +29,6 @@ This directory contains automated workflows for the Paperballs project.
 
 **What it does:**
 - Creates packaged releases for:
-  - CLI version (zip & tar.gz)
   - Web version (zip & tar.gz)
   - Complete source code (zip)
 - Generates release notes
@@ -54,39 +52,12 @@ git push origin v1.0.0
 
 ---
 
-### 3. Deploy to GitHub Pages
-**File:** `deploy-pages.yml`
-**Triggers:** Push to main branch, Manual trigger
-
-**What it does:**
-- Deploys the web version to GitHub Pages
-- Makes the game playable at: `https://dhanjit.github.io/paperballs/`
-- Includes documentation files
-
-**Manual trigger:**
-1. Go to Actions tab on GitHub
-2. Select "Deploy to GitHub Pages"
-3. Click "Run workflow"
-
-**Setup required:**
-1. Go to repository Settings → Pages
-2. Set Source to "GitHub Actions"
-3. Save and the workflow will handle deployment
-
-**Status Badge:**
-```markdown
-![GitHub Pages](https://github.com/dhanjit/paperballs/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
-```
-
----
-
-### 4. Weekly Health Check
+### 3. Weekly Health Check
 **File:** `health-check.yml`
 **Triggers:** Every Sunday at midnight UTC, Manual trigger
 
 **What it does:**
 - Verifies all critical files exist
-- Checks Python compatibility
 - Counts lines of code
 - Monitors documentation completeness
 - Creates a health report
@@ -99,15 +70,6 @@ git push origin v1.0.0
 ---
 
 ## Setup Instructions
-
-### Enable GitHub Pages Deployment
-
-1. **Go to repository Settings**
-2. **Navigate to Pages section**
-3. **Set Source to "GitHub Actions"**
-4. **Save**
-
-The web version will be automatically deployed on every push to main.
 
 ### Enable Dependabot (Optional)
 
@@ -139,7 +101,6 @@ Add these to the top of your README.md:
 ```markdown
 ![CI](https://github.com/dhanjit/paperballs/workflows/CI/badge.svg)
 ![Release](https://github.com/dhanjit/paperballs/workflows/Release/badge.svg)
-![GitHub Pages](https://github.com/dhanjit/paperballs/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
 ```
 
 ---
@@ -190,20 +151,15 @@ Follow [Semantic Versioning](https://semver.org/):
 |----------|---------|---------|-----------|
 | CI | Push, PR | Code validation | None |
 | Release | Tag push | Create releases | 5 packages |
-| Deploy Pages | Push to main | Deploy web app | Live website |
 | Health Check | Weekly | Monitor project | Health report |
+
+**Note:** The web version is deployed to [dhanjit.me/paperballs](https://dhanjit.me/paperballs) via an automated build script in the blog repository, not through GitHub Actions.
 
 ---
 
 ## Troubleshooting
 
 ### CI Fails
-
-**Python linting errors:**
-```bash
-# Run locally to check
-flake8 cli/ --count --select=E9,F63,F7,F82 --show-source
-```
 
 **JavaScript errors:**
 ```bash
@@ -222,16 +178,6 @@ jshint web/js/*.js --config .jshintrc
 
 **Permissions:**
 - Workflow needs `contents: write` permission (already configured)
-
-### GitHub Pages Not Working
-
-**Check Settings:**
-1. Repository Settings → Pages
-2. Source should be "GitHub Actions"
-3. Check Actions logs for deployment errors
-
-**Custom domain:**
-If using a custom domain, add a `CNAME` file to `web/` directory
 
 ---
 
@@ -253,7 +199,6 @@ If using a custom domain, add a `CNAME` file to `web/` directory
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Workflow Syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
-- [GitHub Pages](https://docs.github.com/en/pages)
 - [Semantic Versioning](https://semver.org/)
 
 ---
