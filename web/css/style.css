@@ -78,13 +78,20 @@ main {
 .setup-controls {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
 }
 
+.setup-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .setup-controls label {
     font-weight: 600;
+    white-space: nowrap;
 }
 
 select {

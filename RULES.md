@@ -6,7 +6,8 @@
 - Square grid with N×N vertices (intersection points)
 - Minimum size: 3×3 (9 vertices)
 - Recommended size: 5×5 (25 vertices)
-- Vertices are connected by horizontal, vertical, and diagonal lines
+- Vertices are connected by horizontal, vertical, and optionally diagonal lines
+- **Diagonal Configuration:** The number and type of diagonal connections can be configured
 
 ### Paperballs
 - Each player receives N paperballs (where N = grid dimension)
@@ -16,9 +17,35 @@
 ## Setup
 
 1. Draw or create an N×N grid
-2. Mark all vertices clearly
-3. Decide who goes first (coin flip, mutual agreement, etc.)
-4. Each player takes their N paperballs
+2. Choose diagonal configuration (see Diagonal Options below)
+3. Mark all vertices clearly
+4. Decide who goes first (coin flip, mutual agreement, etc.)
+5. Each player takes their N paperballs
+
+### Diagonal Options
+
+The grid can be configured with different diagonal connections:
+
+**Option 1: No Diagonals**
+- Only horizontal and vertical lines connect vertices
+- Balls can only move up, down, left, right
+- Simplest configuration, good for beginners
+
+**Option 2: Short Diagonals (Standard)**
+- Horizontal, vertical, AND diagonal lines in each unit square
+- Each vertex connects to up to 8 neighbors (orthogonal + diagonal)
+- Most common configuration, balanced gameplay
+
+**Option 3: All Diagonals**
+- Includes short diagonals PLUS long diagonals across the entire grid
+- More movement options and strategic complexity
+- Example: In a 5×5 grid, corners connect diagonally across the whole board
+
+**Option 4: Custom**
+- Select specific diagonal connections
+- Advanced configuration for experienced players
+
+**Recommendation:** Start with **Short Diagonals (Standard)** for your first games.
 
 ## Gameplay
 
@@ -145,6 +172,45 @@ The original game may have supported three players, but the exact rules for 3-pl
 ## Variations to Consider
 
 - Different grid sizes (4×4, 6×6, etc.)
+- Different diagonal configurations (no diagonals, short, all, custom)
 - Different winning conditions (e.g., 4 in a row instead of N)
 - Timed moves
 - Allow passing under certain conditions
+
+## Grid Configuration Examples
+
+### 3×3 Grid with Short Diagonals
+```
+● ─ ● ─ ●
+│╲ │ ╱│
+│ ╲│╱ │
+● ─ ● ─ ●
+│╱ │ ╲│
+│ ╱│╲ │
+● ─ ● ─ ●
+```
+Each vertex connects to 8 neighbors (or fewer at edges)
+
+### 3×3 Grid with All Diagonals
+```
+● ═ ● ═ ●
+║╲╳╱║
+║ ╳ ║
+● ═ ● ═ ●
+║╱╳╲║
+║ ╳ ║
+● ═ ● ═ ●
+```
+Includes long diagonals connecting opposite corners
+
+### 3×3 Grid with No Diagonals
+```
+● ─ ● ─ ●
+│   │   │
+│   │   │
+● ─ ● ─ ●
+│   │   │
+│   │   │
+● ─ ● ─ ●
+```
+Only horizontal and vertical connections
