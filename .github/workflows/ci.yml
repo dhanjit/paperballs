@@ -48,6 +48,18 @@ jobs:
         # Install JSHint globally for JavaScript linting
         npm install -g jshint
 
+    # Install project dependencies for testing
+    - name: Install project dependencies
+      run: |
+        # Install npm packages (includes Jest for testing)
+        npm install
+
+    # Run Jest test suite
+    - name: Run tests
+      run: |
+        # Execute all tests with Jest
+        npm test
+
     # Lint JavaScript files
     - name: Lint JavaScript
       run: |
