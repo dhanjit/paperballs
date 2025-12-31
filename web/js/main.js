@@ -13,9 +13,13 @@ let gameMode = 'pvp'; // Current game mode: 'pvp' or 'pvai'
 function initGame() {
     const gridSize = parseInt(document.getElementById('gridSize').value);
     const diagonalMode = document.getElementById('diagonalMode').value;
+    const winLineLengthValue = document.getElementById('winLineLength').value;
     gameMode = document.getElementById('gameMode').value;
 
-    game = new PaperballsGame(gridSize, diagonalMode);
+    // Parse win line length ('auto' means use grid size)
+    const winLineLength = winLineLengthValue === 'auto' ? gridSize : parseInt(winLineLengthValue);
+
+    game = new PaperballsGame(gridSize, diagonalMode, winLineLength);
     ui = new PaperballsUI(game);
 
     // Initialize AI if needed
@@ -129,7 +133,7 @@ function handleMovementClick(row, col) {
         const result = game.moveBall(row, col);
 
         if (result.success) {
-            // Check for winner
+            // Check for standard winner first
             const winner = game.checkWinner();
             if (winner) {
                 game.winner = winner;
@@ -137,11 +141,23 @@ function handleMovementClick(row, col) {
                 setTimeout(() => ui.showWinner(winner), 300);
             } else {
                 game.switchPlayer();
-                ui.refresh();
 
-                // Check if AI should play
-                if (shouldTriggerAI()) {
-                    executeAITurn();
+                // Check if opponent has any valid moves
+                const opponentHasMoves = game.hasValidMoves(game.currentPlayer);
+                if (!opponentHasMoves) {
+                    // Opponent has no moves - current player (who just switched) loses
+                    // Winner is the player who just moved
+                    const actualWinner = game.currentPlayer === 1 ? 2 : 1;
+                    game.winner = actualWinner;
+                    ui.refresh();
+                    setTimeout(() => ui.showWinnerByImmobilization(actualWinner), 300);
+                } else {
+                    ui.refresh();
+
+                    // Check if AI should play
+                    if (shouldTriggerAI()) {
+                        executeAITurn();
+                    }
                 }
             }
         } else {
@@ -199,10 +215,20 @@ function executeAITurn() {
                     setTimeout(() => ui.showWinner(winner), 300);
                 } else {
                     game.switchPlayer();
-                    ui.refresh();
 
-                    // Re-enable board
-                    svg.style.pointerEvents = 'auto';
+                    // Check if opponent (human) has any valid moves
+                    const opponentHasMoves = game.hasValidMoves(game.currentPlayer);
+                    if (!opponentHasMoves) {
+                        const actualWinner = game.currentPlayer === 1 ? 2 : 1;
+                        game.winner = actualWinner;
+                        ui.refresh();
+                        setTimeout(() => ui.showWinnerByImmobilization(actualWinner), 300);
+                    } else {
+                        ui.refresh();
+
+                        // Re-enable board
+                        svg.style.pointerEvents = 'auto';
+                    }
                 }
             }
         }

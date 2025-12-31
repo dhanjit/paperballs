@@ -326,6 +326,25 @@ class PaperballsUI {
     }
 
     /**
+     * Show winner by immobilization (opponent has no valid moves)
+     */
+    showWinnerByImmobilization(player) {
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+
+        const announcement = document.createElement('div');
+        announcement.className = 'winner-announcement';
+        announcement.innerHTML = `
+            <h2>🏆 ${this.game.getPlayerName(player)} Wins! 🏆</h2>
+            <p>Opponent has no valid moves!</p>
+            <button class="btn btn-primary" onclick="location.reload()">Play Again</button>
+        `;
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(announcement);
+    }
+
+    /**
      * Refresh the entire display
      */
     refresh() {

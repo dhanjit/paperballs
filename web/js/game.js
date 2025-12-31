@@ -3,13 +3,22 @@
  */
 
 class PaperballsGame {
-    constructor(n = 5, diagonalMode = 'short') {
+    constructor(n = 5, diagonalMode = 'short', winLineLength = null) {
         if (n < 3) {
             throw new Error("Grid size must be at least 3");
         }
 
         this.n = n;
         this.diagonalMode = diagonalMode; // 'none', 'main', 'short'
+
+        // Default: N-in-a-row for N×N grid (current behavior)
+        this.winLineLength = winLineLength || n;
+
+        // Validation: winLineLength must be 3 ≤ K ≤ N
+        if (this.winLineLength < 3 || this.winLineLength > n) {
+            throw new Error(`Win line length must be between 3 and ${n}`);
+        }
+
         this.grid = Array(n).fill(null).map(() => Array(n).fill(null));
         this.currentPlayer = 1;
         this.phase = "placement"; // "placement" or "movement"
@@ -168,6 +177,38 @@ class PaperballsGame {
     }
 
     /**
+     * Check if a player has any valid moves
+     * Returns true if the player has at least one legal move available
+     * Only applicable in movement phase
+     */
+    hasValidMoves(player) {
+        if (this.phase !== 'movement') {
+            // During placement, always have moves if empty cells exist
+            return this.grid.some(row => row.some(cell => cell === null));
+        }
+
+        const n = this.n;
+        const grid = this.grid;
+
+        // Find all balls belonging to the player
+        for (let row = 0; row < n; row++) {
+            for (let col = 0; col < n; col++) {
+                if (grid[row][col] === player) {
+                    // Check if this ball has any valid moves
+                    const adjacent = this.getAdjacentPositions(row, col);
+                    const hasMove = adjacent.some(([r, c]) => this.isEmpty(r, c));
+
+                    if (hasMove) {
+                        return true; // Found at least one valid move
+                    }
+                }
+            }
+        }
+
+        return false; // No valid moves found
+    }
+
+    /**
      * Move the selected ball to a new position
      */
     moveBall(toRow, toCol) {
@@ -210,7 +251,26 @@ class PaperballsGame {
     }
 
     /**
+     * Check if K consecutive positions in a line contain the player's ball
+     * Uses sliding window algorithm to check all possible K-length subsequences
+     */
+    checkLineForKConsecutive(positions, player, k) {
+        // Check each K-length subsequence for consecutive player balls
+        for (let start = 0; start <= positions.length - k; start++) {
+            const window = positions.slice(start, start + k);
+            const hasKConsecutive = window.every(([r, c]) =>
+                this.isValidPosition(r, c) && this.grid[r][c] === player
+            );
+            if (hasKConsecutive) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Check if all positions contain the player's ball
+     * @deprecated Use checkLineForKConsecutive() instead
      */
     checkLine(positions, player) {
         return positions.every(([r, c]) =>
@@ -220,34 +280,37 @@ class PaperballsGame {
 
     /**
      * Check if there's a winner
+     * Checks for K consecutive balls in a row (K = winLineLength)
      */
     checkWinner() {
+        const k = this.winLineLength;
+
         for (let player of [1, 2]) {
-            // Check horizontal lines
+            // Check horizontal lines (each row)
             for (let row = 0; row < this.n; row++) {
                 const positions = Array.from({ length: this.n }, (_, col) => [row, col]);
-                if (this.checkLine(positions, player)) {
+                if (this.checkLineForKConsecutive(positions, player, k)) {
                     return player;
                 }
             }
 
-            // Check vertical lines
+            // Check vertical lines (each column)
             for (let col = 0; col < this.n; col++) {
                 const positions = Array.from({ length: this.n }, (_, row) => [row, col]);
-                if (this.checkLine(positions, player)) {
+                if (this.checkLineForKConsecutive(positions, player, k)) {
                     return player;
                 }
             }
 
-            // Check diagonal (top-left to bottom-right)
+            // Check main diagonal (top-left to bottom-right)
             const diagonal1 = Array.from({ length: this.n }, (_, i) => [i, i]);
-            if (this.checkLine(diagonal1, player)) {
+            if (this.checkLineForKConsecutive(diagonal1, player, k)) {
                 return player;
             }
 
-            // Check diagonal (top-right to bottom-left)
+            // Check anti-diagonal (top-right to bottom-left)
             const diagonal2 = Array.from({ length: this.n }, (_, i) => [i, this.n - 1 - i]);
-            if (this.checkLine(diagonal2, player)) {
+            if (this.checkLineForKConsecutive(diagonal2, player, k)) {
                 return player;
             }
         }
@@ -282,7 +345,8 @@ class PaperballsGame {
             ballsPerPlayer: this.ballsPerPlayer,
             selectedBall: this.selectedBall ? { ...this.selectedBall } : null,
             winner: this.winner,
-            diagonalMode: this.diagonalMode
+            diagonalMode: this.diagonalMode,
+            winLineLength: this.winLineLength
         };
     }
 }
