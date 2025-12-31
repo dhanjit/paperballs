@@ -39,6 +39,21 @@
                             <option value="all">All Diagonals</option>
                         </select>
                     </div>
+                    <div class="setup-option">
+                        <label for="gameMode">Game Mode:</label>
+                        <select id="gameMode">
+                            <option value="pvp" selected>Player vs Player</option>
+                            <option value="pvai">Player vs AI</option>
+                        </select>
+                    </div>
+                    <div class="setup-option" id="difficultyOption" style="display: none;">
+                        <label for="aiDifficulty">AI Difficulty:</label>
+                        <select id="aiDifficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
                     <button id="startGame" class="btn btn-primary">Start Game</button>
                 </div>
             </section>
@@ -106,6 +121,14 @@
 
     <script src="js/game.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/ai.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        // Show/hide AI difficulty selector based on game mode
+        document.getElementById('gameMode').addEventListener('change', (e) => {
+            const difficultyOption = document.getElementById('difficultyOption');
+            difficultyOption.style.display = e.target.value === 'pvai' ? 'block' : 'none';
+        });
+    </script>
 </body>
 </html>

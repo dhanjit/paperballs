@@ -34,7 +34,8 @@
     "testEnvironment": "node",
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
-      "web/js/game.js"
+      "web/js/game.js",
+      "web/js/ai.js"
     ],
     "coverageThreshold": {
       "global": {
