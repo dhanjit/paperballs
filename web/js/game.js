@@ -249,7 +249,8 @@ class PaperballsGame {
             ballsPlaced: { ...this.ballsPlaced },
             ballsPerPlayer: this.ballsPerPlayer,
             selectedBall: this.selectedBall ? { ...this.selectedBall } : null,
-            winner: this.winner
+            winner: this.winner,
+            diagonalMode: this.diagonalMode
         };
     }
 }
