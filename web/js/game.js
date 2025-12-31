@@ -9,7 +9,7 @@ class PaperballsGame {
         }
 
         this.n = n;
-        this.diagonalMode = diagonalMode; // 'none', 'short', 'all'
+        this.diagonalMode = diagonalMode; // 'none', 'main', 'short'
         this.grid = Array(n).fill(null).map(() => Array(n).fill(null));
         this.currentPlayer = 1;
         this.phase = "placement"; // "placement" or "movement"
@@ -31,6 +31,20 @@ class PaperballsGame {
      */
     isEmpty(row, col) {
         return this.isValidPosition(row, col) && this.grid[row][col] === null;
+    }
+
+    /**
+     * Check if a position is on the main diagonal (top-left to bottom-right)
+     */
+    isOnMainDiagonal(row, col) {
+        return row === col;
+    }
+
+    /**
+     * Check if a position is on the anti-diagonal (top-right to bottom-left)
+     */
+    isOnAntiDiagonal(row, col) {
+        return row + col === this.n - 1;
     }
 
     /**
@@ -59,18 +73,36 @@ class PaperballsGame {
         if (this.diagonalMode === 'none') {
             // Only orthogonal (4-way)
             directions = orthogonal;
-        } else if (this.diagonalMode === 'short') {
-            // Orthogonal + short diagonals (8-way)
-            directions = [...orthogonal, ...shortDiagonal];
-        } else if (this.diagonalMode === 'all') {
-            // Orthogonal + all diagonals (short + long)
-            directions = [...orthogonal, ...shortDiagonal];
+        } else if (this.diagonalMode === 'main') {
+            // Orthogonal + main diagonals only
+            directions = [...orthogonal];
 
-            // Add long diagonals
-            for (let i = 2; i < this.n; i++) {
-                directions.push([-i, -i], [-i, i], [i, -i], [i, i]); // long diagonals
-                directions.push([-i, 0], [i, 0], [0, -i], [0, i]);   // long orthogonals
+            // Add diagonal directions only if both current and adjacent positions are on main diagonals
+            const onMainDiag = this.isOnMainDiagonal(row, col);
+            const onAntiDiag = this.isOnAntiDiagonal(row, col);
+
+            if (onMainDiag) {
+                // Can move along main diagonal: up-left or down-right
+                if (this.isValidPosition(row - 1, col - 1)) {
+                    directions.push([-1, -1]);
+                }
+                if (this.isValidPosition(row + 1, col + 1)) {
+                    directions.push([1, 1]);
+                }
             }
+
+            if (onAntiDiag) {
+                // Can move along anti-diagonal: up-right or down-left
+                if (this.isValidPosition(row - 1, col + 1)) {
+                    directions.push([-1, 1]);
+                }
+                if (this.isValidPosition(row + 1, col - 1)) {
+                    directions.push([1, -1]);
+                }
+            }
+        } else if (this.diagonalMode === 'short') {
+            // Orthogonal + short diagonals (8-way movement everywhere)
+            directions = [...orthogonal, ...shortDiagonal];
         }
 
         return directions

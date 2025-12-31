@@ -36,7 +36,7 @@ Paperballs is a two-player strategy game played on a square grid. Players take t
 
 - **Players:** 1-2 (Player vs AI or Player vs Player)
 - **Grid Size:** N×N vertices (minimum N=3, recommended N=5)
-- **Diagonal Configuration:** Choose between no diagonals, short diagonals (standard), or all diagonals
+- **Diagonal Configuration:** Choose between no diagonals, main diagonals only, or 8-way movement
 - **Pieces:** Each player gets N paperballs
 - **Objective:** Form a straight line (horizontal, vertical, or diagonal) with your paperballs
 
@@ -46,8 +46,8 @@ Paperballs is a two-player strategy game played on a square grid. Players take t
 1. Create an N×N square grid (N points on each side)
 2. Choose diagonal configuration:
    - **No Diagonals:** Only horizontal/vertical movement (4-way)
-   - **Short Diagonals (Standard):** Includes diagonal connections in each square (8-way)
-   - **All Diagonals:** Includes long diagonals across the entire grid
+   - **Main Diagonals Only:** Diagonal movement only along the two main diagonals
+   - **8-way Movement:** Full diagonal connections in each square (8-way everywhere)
 3. Each player receives N paperballs
 4. Minimum grid size is 3×3; 5×5 is recommended for a good game
 

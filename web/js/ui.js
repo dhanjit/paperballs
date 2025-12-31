@@ -125,21 +125,40 @@ class PaperballsUI {
             }
         }
 
-        // Diagonal lines (top-left to bottom-right)
-        for (let i = 0; i < n - 1; i++) {
-            for (let j = 0; j < n - 1; j++) {
-                const { x: x1, y: y1 } = this.gridToSvg(i, j);
-                const { x: x2, y: y2 } = this.gridToSvg(i + 1, j + 1);
-                createLine(x1, y1, x2, y2);
-            }
-        }
+        // Diagonal lines - only draw based on diagonal mode
+        const diagonalMode = this.game.diagonalMode;
 
-        // Diagonal lines (top-right to bottom-left)
-        for (let i = 0; i < n - 1; i++) {
-            for (let j = 1; j < n; j++) {
-                const { x: x1, y: y1 } = this.gridToSvg(i, j);
-                const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
-                createLine(x1, y1, x2, y2);
+        if (diagonalMode === 'main') {
+            // Only draw the two main diagonal lines
+            // Main diagonal: top-left to bottom-right
+            const { x: x1, y: y1 } = this.gridToSvg(0, 0);
+            const { x: x2, y: y2 } = this.gridToSvg(n - 1, n - 1);
+            createLine(x1, y1, x2, y2);
+
+            // Anti-diagonal: top-right to bottom-left
+            const { x: x3, y: y3 } = this.gridToSvg(0, n - 1);
+            const { x: x4, y: y4 } = this.gridToSvg(n - 1, 0);
+            createLine(x3, y3, x4, y4);
+        } else if (diagonalMode === 'short') {
+            // Short diagonal lines (8-way movement everywhere)
+            // Draw all diagonal connections between adjacent vertices
+
+            // Top-left to bottom-right diagonals
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 0; j < n - 1; j++) {
+                    const { x: x1, y: y1 } = this.gridToSvg(i, j);
+                    const { x: x2, y: y2 } = this.gridToSvg(i + 1, j + 1);
+                    createLine(x1, y1, x2, y2);
+                }
+            }
+
+            // Top-right to bottom-left diagonals
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = 1; j < n; j++) {
+                    const { x: x1, y: y1 } = this.gridToSvg(i, j);
+                    const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
+                    createLine(x1, y1, x2, y2);
+                }
             }
         }
     }

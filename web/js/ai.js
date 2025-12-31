@@ -392,16 +392,35 @@ class PaperballsAI {
 
         if (diagonalMode === 'none') {
             directions = orthogonal;
+        } else if (diagonalMode === 'main') {
+            // Orthogonal + main diagonals only
+            directions = [...orthogonal];
+
+            // Check if position is on main diagonal or anti-diagonal
+            const onMainDiag = row === col;
+            const onAntiDiag = row + col === n - 1;
+
+            if (onMainDiag) {
+                // Can move along main diagonal
+                if (row - 1 >= 0 && col - 1 >= 0) {
+                    directions.push([-1, -1]);
+                }
+                if (row + 1 < n && col + 1 < n) {
+                    directions.push([1, 1]);
+                }
+            }
+
+            if (onAntiDiag) {
+                // Can move along anti-diagonal
+                if (row - 1 >= 0 && col + 1 < n) {
+                    directions.push([-1, 1]);
+                }
+                if (row + 1 < n && col - 1 >= 0) {
+                    directions.push([1, -1]);
+                }
+            }
         } else if (diagonalMode === 'short') {
             directions = [...orthogonal, ...shortDiagonal];
-        } else if (diagonalMode === 'all') {
-            directions = [...orthogonal, ...shortDiagonal];
-
-            // Add long diagonals and orthogonals
-            for (let i = 2; i < n; i++) {
-                directions.push([-i, -i], [-i, i], [i, -i], [i, i]);
-                directions.push([-i, 0], [i, 0], [0, -i], [0, i]);
-            }
         }
 
         return directions
