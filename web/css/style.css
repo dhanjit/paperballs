@@ -2,15 +2,18 @@
 
 :root {
     --primary-color: #2c3e50;
-    --secondary-color: #3498db;
-    --player1-color: #e74c3c;
-    --player2-color: #3498db;
-    --bg-color: #ecf0f1;
-    --panel-bg: #ffffff;
+    --secondary-color: #2980b9;
+    --player1-color: #ecf0f1;
+    /* White paper */
+    --player2-color: #d35400;
+    /* Burnt orange/brown paper */
+    --bg-color: transparent;
+    --panel-bg: rgba(255, 255, 255, 0.9);
     --border-color: #bdc3c7;
     --text-color: #2c3e50;
     --success-color: #27ae60;
-    --grid-color: #34495e;
+    --grid-color: #4a4a4a;
+    /* Graphite */
 }
 
 * {
@@ -20,16 +23,25 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Indie Flower', cursive;
+    background-color: #fdfbf7;
+    background-image:
+        linear-gradient(90deg, transparent 80px, #ff9ea5 80px, #ff9ea5 82px, transparent 82px),
+        linear-gradient(#e1e1e1 1px, transparent 1px);
+    background-size: 100% 100%, 100% 2em;
+    background-position: 0 0, 0 1em;
     min-height: 100vh;
     padding: 20px;
     color: var(--text-color);
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 header {
@@ -41,7 +53,7 @@ header {
 header h1 {
     font-size: 3em;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .subtitle {
@@ -59,7 +71,7 @@ main {
     background: var(--panel-bg);
     border-radius: 12px;
     padding: 25px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Setup Section */
@@ -119,7 +131,7 @@ select:focus {
 .btn-primary:hover {
     background: #2980b9;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
@@ -184,66 +196,86 @@ select:focus {
 }
 
 #gameSvg {
-    max-width: 100%;
+    max-width: 95vw;
+    max-height: 80vh;
     height: auto;
+    width: auto;
+    display: block;
 }
 
 .grid-line {
     stroke: var(--grid-color);
     stroke-width: 2;
-    opacity: 0.3;
+    opacity: 0.6;
 }
 
+/* Vertices */
 .vertex {
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.vertex circle {
-    fill: #95a5a6;
-    stroke: var(--grid-color);
-    stroke-width: 2;
+/* Hit area (invisible by default, visible on hover for empty spots) */
+.vertex .hit-area {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 0;
+    transition: all 0.2s;
 }
 
-.vertex:hover circle {
-    fill: #7f8c8d;
-    r: 12;
+/* Hover effect for empty vertices */
+.vertex:not(.occupied):hover .hit-area {
+    fill: rgba(0, 0, 0, 0.1);
+    r: 15;
 }
 
+/* Occupied vertices */
 .vertex.occupied {
-    cursor: not-allowed;
+    cursor: grab;
 }
 
-.vertex.occupied:hover circle {
-    r: 10;
+/* Selected ball effect */
+.vertex.selected image {
+    filter: drop-shadow(0 0 10px var(--success-color));
 }
 
-.vertex.player-1 circle {
-    fill: var(--player1-color);
-    stroke: #c0392b;
+/* Ball Image Styling */
+.vertex image {
+    pointer-events: none;
+    /* Ensure clicks go through to the hit-area if needed */
 }
 
-.vertex.player-2 circle {
-    fill: var(--player2-color);
-    stroke: #2980b9;
-}
-
-.vertex.selected circle {
-    stroke: var(--success-color);
-    stroke-width: 4;
-    filter: drop-shadow(0 0 8px var(--success-color));
-}
-
-.vertex.valid-move circle {
+/* Valid move highlight */
+.vertex.valid-move .hit-area {
     fill: var(--success-color);
     opacity: 0.5;
     animation: pulse 1s infinite;
 }
 
+/* Legacy circle styling removed - using images now */
+/*
+.vertex.player-1 circle {
+    fill: var(--player1-color);
+    stroke: #95a5a6;
+    stroke-width: 1;
+    r: 20;
+}
+
+.vertex.player-2 circle {
+    fill: var(--player2-color);
+    stroke: #8e44ad;
+    stroke-width: 1;
+    r: 20;
+}
+*/
+
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.5;
     }
+
     50% {
         opacity: 0.8;
     }
@@ -334,7 +366,7 @@ footer a:hover {
     background: white;
     padding: 40px;
     border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     text-align: center;
     z-index: 1000;
     animation: slideIn 0.5s;
@@ -345,6 +377,7 @@ footer a:hover {
         transform: translate(-50%, -60%);
         opacity: 0;
     }
+
     to {
         transform: translate(-50%, -50%);
         opacity: 1;
@@ -367,6 +400,6 @@ footer a:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }

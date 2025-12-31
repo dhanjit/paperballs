@@ -1,3 +1,0 @@
-# Paperballs CLI - Python Dependencies
-# Currently uses only Python standard library
-# Python 3.7+ required
