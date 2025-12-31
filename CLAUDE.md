@@ -759,10 +759,26 @@ The result is a complete, well-documented, multi-platform game developed in a fr
 
 **Version:** 1.1
 **Last Updated:** December 2025
-**Claude Model:** Claude 3.5 Sonnet (Initial), Claude Sonnet 4.5 (Workflow Documentation)
-**Development Time:** Single session (initial), ongoing (enhancements)
-**Files Created:** 16+
-**Lines of Code:** ~2,900+
+**Claude Model:** Claude 3.5 Sonnet (Initial), Claude Sonnet 4.5 (Workflow Documentation & UI Overhaul)
+**Development Time:** Multiple sessions
+**Files Created:** ~26
+**Lines of Code:** ~3,100+
+
+### Version 1.1 Updates
+
+**Notebook Theme UI Overhaul:**
+Claude and the human developer overhauled the UI to match the original "notebook paper" vision:
+- **Visuals:** Implemented CSS radial/linear gradients for ruled paper background.
+- **Assets:** Integrated transparent PNG "paper crumb" assets for a 3D feel.
+- **Rendering:** Restored full grid with svg-filters for a hand-drawn pencil look.
+- **Refactoring:** Cleaned up `ui.js` to support asset randomization and improved rendering performance.
+
+**Workflow Documentation:**
+Documented comprehensive git workflow and feature branch practices:
+- **Branch Strategy:** One branch per feature approach with `claude/*` naming convention
+- **CI Integration:** Automated validation for all feature branches
+- **Development Lifecycle:** 6-phase workflow from branch creation to merge
+- **Best Practices:** Guidelines for concurrent feature development and release management
 
 ---
 
