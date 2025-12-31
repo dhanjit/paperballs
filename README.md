@@ -48,26 +48,18 @@ A player wins by forming a straight line with their paperballs in any direction:
 
 1. ✅ Document the rules and gameplay
 2. ✅ Create a playable web version (hosted on dhanjit.me)
-3. ✅ Develop a terminal/CLI version
-4. ⬜ Create mobile apps
-5. ✅ Write a blog post documenting the development process
-
-## Versions
-
-- **Terminal/CLI:** Play in your command line
-- **Web:** Browser-based version with interactive UI
-- **Mobile:** Native apps for iOS and Android (planned)
+3. ✅ Write a blog post documenting the development process
 
 ## Getting Started
 
 ### Play the Web Version
 
-**Option 1: Live on dhanjit.me**
+**Live Game:**
 ```
 https://dhanjit.me/paperballs/
 ```
 
-**Option 2: Local**
+**Local Development:**
 ```bash
 # Clone the repository
 git clone https://github.com/dhanjit/paperballs.git
@@ -77,16 +69,6 @@ cd paperballs/web
 open index.html  # macOS
 xdg-open index.html  # Linux
 start index.html  # Windows
-```
-
-### Play the Terminal Version
-
-```bash
-# Navigate to CLI directory
-cd paperballs/cli
-
-# Run the game (requires Python 3.7+)
-python3 paperballs.py
 ```
 
 ## CI/CD & Automation
@@ -102,15 +84,13 @@ See [.github/workflows/README.md](.github/workflows/README.md) for workflow deta
 
 ## Development
 
-This project is a recreation of a childhood game, preserving the simple yet strategic gameplay while making it accessible across different platforms.
+This project is a recreation of a childhood game, preserving the simple yet strategic gameplay in an accessible web-based format.
 
 ### Project Structure
 ```
 paperballs/
-├── cli/          # Python terminal version
 ├── web/          # Browser-based version
-├── mobile/       # Mobile app plans
-├── docs/         # Documentation and blog
+├── docs/         # Documentation
 └── .github/      # CI/CD workflows
 ```
 
