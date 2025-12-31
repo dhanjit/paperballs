@@ -418,12 +418,19 @@ The result is a complete, well-documented, multi-platform game developed in a fr
 
 ---
 
-**Version:** 1.0
+**Version:** 1.1 (UI Overhaul)
 **Last Updated:** December 2025
 **Claude Model:** Claude 3.5 Sonnet
-**Development Time:** Single session
-**Files Created:** 16
-**Lines of Code:** ~2,900+
+**Development Time:** Two sessions
+**Files Created:** ~26
+**Lines of Code:** ~3,100+
+
+### Version 1.1 Update: Notebook Theme
+In the second session, Claude and the human developer overhauled the UI to match the original "notebook paper" vision:
+- **Visuals:** Implemented CSS radial/linear gradients for ruled paper background.
+- **Assets:** Integrated transparent PNG "paper crumb" assets for a 3D feel.
+- **Rendering:** Restored full grid with svg-filters for a hand-drawn pencil look.
+- **Refactoring:** Cleaned up `ui.js` to support asset randomization and improved rendering performance.
 
 ---
 
