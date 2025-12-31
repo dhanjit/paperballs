@@ -11,11 +11,10 @@ This directory contains automated workflows for the Paperballs project.
 **Triggers:** Push to main/develop/claude/* branches, Pull Requests
 
 **What it does:**
-- Validates Python code (syntax, linting)
 - Validates JavaScript code
 - Checks HTML structure
 - Verifies documentation files exist
-- Tests CLI game initialization
+- Validates web file structure
 
 **Status Badge:**
 ```markdown
@@ -30,7 +29,6 @@ This directory contains automated workflows for the Paperballs project.
 
 **What it does:**
 - Creates packaged releases for:
-  - CLI version (zip & tar.gz)
   - Web version (zip & tar.gz)
   - Complete source code (zip)
 - Generates release notes
@@ -60,7 +58,6 @@ git push origin v1.0.0
 
 **What it does:**
 - Verifies all critical files exist
-- Checks Python compatibility
 - Counts lines of code
 - Monitors documentation completeness
 - Creates a health report
@@ -163,12 +160,6 @@ Follow [Semantic Versioning](https://semver.org/):
 ## Troubleshooting
 
 ### CI Fails
-
-**Python linting errors:**
-```bash
-# Run locally to check
-flake8 cli/ --count --select=E9,F63,F7,F82 --show-source
-```
 
 **JavaScript errors:**
 ```bash
