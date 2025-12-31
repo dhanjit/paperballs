@@ -173,8 +173,8 @@ describe.each([
 // ============================================================================
 describe.each([
     ['none', 4],     // Orthogonal only (4 directions)
+    ['main', 8],     // Orthogonal + main diagonals only (8 from center, less from edges)
     ['short', 8],    // Orthogonal + short diagonals (8 directions)
-    ['all', 'many'], // All diagonals (many directions)
 ])('Adjacency with mode=%s', (diagonalMode, expectedDirections) => {
     let game;
 
@@ -234,29 +234,56 @@ describe.each([
         });
     }
 
-    if (diagonalMode === 'all') {
-        test('allows all diagonal moves in all mode', () => {
-            const adjacent = game.getAdjacentPositions(2, 2);
+    if (diagonalMode === 'main') {
+        test('allows diagonal moves only along main diagonals', () => {
+            // Test from center (2,2) - on both main and anti-diagonal
+            const adjacentCenter = game.getAdjacentPositions(2, 2);
 
-            // Short diagonals should be included
-            expect(adjacent).toContainEqual([1, 1]);
-            expect(adjacent).toContainEqual([1, 3]);
+            // Should include all 4 orthogonal directions
+            expect(adjacentCenter).toContainEqual([1, 2]); // Up
+            expect(adjacentCenter).toContainEqual([3, 2]); // Down
+            expect(adjacentCenter).toContainEqual([2, 1]); // Left
+            expect(adjacentCenter).toContainEqual([2, 3]); // Right
 
-            // Long diagonals should also be included
-            expect(adjacent).toContainEqual([0, 0]); // Far top-left
-            expect(adjacent).toContainEqual([0, 4]); // Far top-right
-            expect(adjacent).toContainEqual([4, 0]); // Far bottom-left
-            expect(adjacent).toContainEqual([4, 4]); // Far bottom-right
+            // Should include diagonals along main diagonal
+            expect(adjacentCenter).toContainEqual([1, 1]); // Up-left on main diagonal
+            expect(adjacentCenter).toContainEqual([3, 3]); // Down-right on main diagonal
+
+            // Should include diagonals along anti-diagonal
+            expect(adjacentCenter).toContainEqual([1, 3]); // Up-right on anti-diagonal
+            expect(adjacentCenter).toContainEqual([3, 1]); // Down-left on anti-diagonal
+
+            // Total: 8 directions from center
+            expect(adjacentCenter.length).toBe(8);
         });
 
-        test('allows long orthogonal moves in all mode', () => {
-            const adjacent = game.getAdjacentPositions(2, 2);
+        test('rejects diagonal moves NOT on main diagonals', () => {
+            // Test from position (1,2) - NOT on any main diagonal
+            const adjacent = game.getAdjacentPositions(1, 2);
 
-            // Long orthogonal moves should be included
-            expect(adjacent).toContainEqual([0, 2]); // Far up
-            expect(adjacent).toContainEqual([4, 2]); // Far down
-            expect(adjacent).toContainEqual([2, 0]); // Far left
-            expect(adjacent).toContainEqual([2, 4]); // Far right
+            // Should NOT include any diagonal moves
+            expect(adjacent).not.toContainEqual([0, 1]); // Up-left
+            expect(adjacent).not.toContainEqual([0, 3]); // Up-right
+            expect(adjacent).not.toContainEqual([2, 1]); // Down-left
+            expect(adjacent).not.toContainEqual([2, 3]); // Down-right
+
+            // Should only have orthogonal moves (4 directions)
+            expect(adjacent.length).toBe(4);
+        });
+
+        test('allows diagonal moves from corner on main diagonal', () => {
+            // Test from (0,0) - on main diagonal
+            const adjacent = game.getAdjacentPositions(0, 0);
+
+            // Should include orthogonal moves
+            expect(adjacent).toContainEqual([0, 1]); // Right
+            expect(adjacent).toContainEqual([1, 0]); // Down
+
+            // Should include diagonal move along main diagonal
+            expect(adjacent).toContainEqual([1, 1]); // Down-right on main diagonal
+
+            // Total: 3 directions
+            expect(adjacent.length).toBe(3);
         });
     }
 

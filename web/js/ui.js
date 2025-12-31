@@ -128,8 +128,22 @@ class PaperballsUI {
         // Diagonal lines - only draw based on diagonal mode
         const diagonalMode = this.game.diagonalMode;
 
-        if (diagonalMode === 'short' || diagonalMode === 'all') {
-            // Short diagonal lines (top-left to bottom-right)
+        if (diagonalMode === 'main') {
+            // Only draw the two main diagonal lines
+            // Main diagonal: top-left to bottom-right
+            const { x: x1, y: y1 } = this.gridToSvg(0, 0);
+            const { x: x2, y: y2 } = this.gridToSvg(n - 1, n - 1);
+            createLine(x1, y1, x2, y2);
+
+            // Anti-diagonal: top-right to bottom-left
+            const { x: x3, y: y3 } = this.gridToSvg(0, n - 1);
+            const { x: x4, y: y4 } = this.gridToSvg(n - 1, 0);
+            createLine(x3, y3, x4, y4);
+        } else if (diagonalMode === 'short') {
+            // Short diagonal lines (8-way movement everywhere)
+            // Draw all diagonal connections between adjacent vertices
+
+            // Top-left to bottom-right diagonals
             for (let i = 0; i < n - 1; i++) {
                 for (let j = 0; j < n - 1; j++) {
                     const { x: x1, y: y1 } = this.gridToSvg(i, j);
@@ -138,47 +152,12 @@ class PaperballsUI {
                 }
             }
 
-            // Short diagonal lines (top-right to bottom-left)
+            // Top-right to bottom-left diagonals
             for (let i = 0; i < n - 1; i++) {
                 for (let j = 1; j < n; j++) {
                     const { x: x1, y: y1 } = this.gridToSvg(i, j);
                     const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
                     createLine(x1, y1, x2, y2);
-                }
-            }
-        }
-
-        if (diagonalMode === 'all') {
-            // Long diagonal lines (main diagonal: top-left to bottom-right)
-            const { x: x1, y: y1 } = this.gridToSvg(0, 0);
-            const { x: x2, y: y2 } = this.gridToSvg(n - 1, n - 1);
-            createLine(x1, y1, x2, y2);
-
-            // Long diagonal line (anti-diagonal: top-right to bottom-left)
-            const { x: x3, y: y3 } = this.gridToSvg(0, n - 1);
-            const { x: x4, y: y4 } = this.gridToSvg(n - 1, 0);
-            createLine(x3, y3, x4, y4);
-
-            // Additional long diagonals for larger grids
-            for (let offset = 2; offset < n; offset++) {
-                // Diagonals parallel to main diagonal
-                for (let start = 0; start <= n - offset; start++) {
-                    const { x: sx1, y: sy1 } = this.gridToSvg(start, start + offset);
-                    const { x: sx2, y: sy2 } = this.gridToSvg(start + offset, start);
-                    createLine(sx1, sy1, sx1 + offset * this.cellSize, sy1 + offset * this.cellSize);
-                    createLine(sx2, sy2, sx2 - offset * this.cellSize, sy2 + offset * this.cellSize);
-                }
-
-                // Diagonals parallel to anti-diagonal
-                for (let start = 0; start <= n - offset; start++) {
-                    const { x: ax1, y: ay1 } = this.gridToSvg(start, n - 1 - offset - start);
-                    const { x: ax2, y: ay2 } = this.gridToSvg(start + offset, n - 1 - start);
-                    if (n - 1 - offset - start >= 0) {
-                        createLine(ax1, ay1, ax1 + offset * this.cellSize, ay1 - offset * this.cellSize);
-                    }
-                    if (n - 1 - start >= 0) {
-                        createLine(ax2, ay2, ax2 - offset * this.cellSize, ay2 - offset * this.cellSize);
-                    }
                 }
             }
         }

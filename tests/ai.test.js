@@ -243,7 +243,7 @@ describe('PaperballsAI', () => {
     describe('Adjacent Positions', () => {
         test.each([
             ['short', 8],  // 4 orthogonal + 4 short diagonal
-            ['all', 8]  // For 3x3 grid from center, all adjacent cells are already covered by short diagonals
+            ['main', 8]  // For 3x3 grid from center, center is on both main diagonals
         ])('diagonal mode %s returns correct adjacency count from center', (mode, expectedCount) => {
             const testGame = new PaperballsGame(3, mode);
             const testAI = new PaperballsAI('medium');
