@@ -82,7 +82,6 @@ Claude designed the overall project structure:
 **GitHub Actions Workflows:**
 - Created comprehensive CI/CD pipeline
 - Set up automated testing and validation
-- Configured GitHub Pages deployment
 - Implemented release automation
 
 **Git Workflow Documentation:**
@@ -420,7 +419,7 @@ Feature branches integrate seamlessly with the release workflow:
 
 **Development Flow:**
 1. **Features Merged to Main** → Accumulates changes for next release
-2. **Main Branch Updated** → Auto-deploys web version to GitHub Pages
+2. **Main Branch Updated** → Web version integrated into dhanjit.me blog via automated build script
 3. **Version Tag Created** (e.g., `v1.1.0`) → Triggers release workflow
 4. **Automated Release** → Packages and publishes to GitHub Releases
 

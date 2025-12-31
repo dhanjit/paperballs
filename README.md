@@ -2,7 +2,6 @@
 
 ![CI](https://github.com/dhanjit/paperballs/workflows/CI/badge.svg)
 ![Release](https://github.com/dhanjit/paperballs/workflows/Release/badge.svg)
-![GitHub Pages](https://github.com/dhanjit/paperballs/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
 
 A childhood game recreated - a strategic two-player game combining placement and movement mechanics.
 
@@ -63,9 +62,9 @@ A player wins by forming a straight line with their paperballs in any direction:
 
 ### Play the Web Version
 
-**Option 1: GitHub Pages (Live)**
+**Option 1: Live on dhanjit.me**
 ```
-https://dhanjit.github.io/paperballs/
+https://dhanjit.me/paperballs/
 ```
 
 **Option 2: Local**
@@ -95,8 +94,9 @@ python3 paperballs.py
 This project uses GitHub Actions for:
 - **Continuous Integration**: Automated code validation on every push
 - **Releases**: Automatic package creation when tags are pushed
-- **Deployment**: Auto-deploy web version to GitHub Pages
 - **Health Checks**: Weekly project monitoring
+
+**Deployment**: The web version is integrated into [dhanjit.me](https://dhanjit.me) via an automated build script that copies files from this repository
 
 See [.github/workflows/README.md](.github/workflows/README.md) for workflow details.
 
