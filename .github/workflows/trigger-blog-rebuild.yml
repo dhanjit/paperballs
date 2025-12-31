@@ -10,10 +10,8 @@ jobs:
   trigger-rebuild:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger update in dhanjit.me
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: dhanjit/dhanjit.me
-          event-type: update-paperballs
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      - name: Trigger Vercel Redeploy
+        if: env.VERCEL_DEPLOY_HOOK != ''
+        run: curl -X POST ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
