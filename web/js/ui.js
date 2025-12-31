@@ -22,6 +22,26 @@ class PaperballsUI {
         this.svg.setAttribute('height', totalSize);
     }
 
+    addFilters() {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+        // Filter for pencil lines (roughness) - Adjusted for better visibility
+        const pencilFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        pencilFilter.setAttribute('id', 'pencil');
+        // Large buffer to prevent clipping of displaced lines (esp for thin horizontal/vertical lines)
+        pencilFilter.setAttribute('x', '-500%');
+        pencilFilter.setAttribute('y', '-500%');
+        pencilFilter.setAttribute('width', '1100%');
+        pencilFilter.setAttribute('height', '1100%');
+        pencilFilter.innerHTML = `
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" />
+        `;
+        defs.appendChild(pencilFilter);
+
+        this.svg.appendChild(defs);
+    }
+
     /**
      * Convert grid coordinates to SVG coordinates
      */
@@ -39,6 +59,9 @@ class PaperballsUI {
         // Clear existing content
         this.svg.innerHTML = '';
 
+        // Add filters
+        this.addFilters();
+
         // Draw grid lines
         this.drawGridLines();
 
@@ -52,28 +75,54 @@ class PaperballsUI {
     drawGridLines() {
         const n = this.game.n;
 
+        // Group for all grid lines to apply single filter (fixes clipping/disappearance)
+        const linesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        linesGroup.setAttribute('class', 'grid-lines-group');
+        linesGroup.style.filter = 'url(#pencil)';
+        this.svg.appendChild(linesGroup);
+
+        // Helper to create line
+        const createLine = (x1, y1, x2, y2) => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('class', 'grid-line');
+            line.setAttribute('stroke-width', '2.5');
+            // Filter is now on parent group
+            linesGroup.appendChild(line);
+        };
+
         // Horizontal lines
         for (let row = 0; row < n; row++) {
             const y = this.margin + row * this.cellSize;
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', this.margin);
-            line.setAttribute('y1', y);
-            line.setAttribute('x2', this.margin + (n - 1) * this.cellSize);
-            line.setAttribute('y2', y);
-            line.setAttribute('class', 'grid-line');
-            this.svg.appendChild(line);
+            createLine(this.margin, y, this.margin + (n - 1) * this.cellSize, y);
         }
 
         // Vertical lines
         for (let col = 0; col < n; col++) {
             const x = this.margin + col * this.cellSize;
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x);
-            line.setAttribute('y1', this.margin);
-            line.setAttribute('x2', x);
-            line.setAttribute('y2', this.margin + (n - 1) * this.cellSize);
-            line.setAttribute('class', 'grid-line');
-            this.svg.appendChild(line);
+            createLine(x, this.margin, x, this.margin + (n - 1) * this.cellSize);
+        }
+
+        // Draw intersection dots
+        const dotsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        dotsGroup.style.filter = 'url(#pencil)';
+        this.svg.appendChild(dotsGroup);
+
+        for (let row = 0; row < n; row++) {
+            for (let col = 0; col < n; col++) {
+                const { x, y } = this.gridToSvg(row, col);
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('cx', x);
+                dot.setAttribute('cy', y);
+                dot.setAttribute('r', '3');
+                dot.setAttribute('class', 'grid-intersection');
+                dot.style.fill = 'var(--grid-color)';
+                dot.style.opacity = '0.6';
+                dotsGroup.appendChild(dot);
+            }
         }
 
         // Diagonal lines (top-left to bottom-right)
@@ -81,13 +130,7 @@ class PaperballsUI {
             for (let j = 0; j < n - 1; j++) {
                 const { x: x1, y: y1 } = this.gridToSvg(i, j);
                 const { x: x2, y: y2 } = this.gridToSvg(i + 1, j + 1);
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('class', 'grid-line');
-                this.svg.appendChild(line);
+                createLine(x1, y1, x2, y2);
             }
         }
 
@@ -96,13 +139,7 @@ class PaperballsUI {
             for (let j = 1; j < n; j++) {
                 const { x: x1, y: y1 } = this.gridToSvg(i, j);
                 const { x: x2, y: y2 } = this.gridToSvg(i + 1, j - 1);
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('class', 'grid-line');
-                this.svg.appendChild(line);
+                createLine(x1, y1, x2, y2);
             }
         }
     }
@@ -152,12 +189,45 @@ class PaperballsUI {
             group.classList.add('selected');
         }
 
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
-        circle.setAttribute('r', this.vertexRadius);
+        // Invisible circle for hit area / hover effect on empty spots
+        const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hitArea.setAttribute('cx', x);
+        hitArea.setAttribute('cy', y);
+        hitArea.setAttribute('r', this.vertexRadius); // Standard hit radius
+        hitArea.setAttribute('class', 'hit-area');
+        group.appendChild(hitArea);
 
-        group.appendChild(circle);
+        // If player is present, draw the paper ball image
+        if (player) {
+            const size = this.cellSize * 0.8; // 80% of cell size
+            const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+            img.setAttribute('x', x - size / 2);
+            img.setAttribute('y', y - size / 2);
+            img.setAttribute('width', size);
+            img.setAttribute('height', size);
+
+            // Player 1 = White, Player 2 = Brown
+            let imgSrc;
+            if (player === 1) {
+                // Deterministic random selection for white balls (1-5) based on position
+                const randomIdx = ((row * 11 + col * 17) % 5) + 1;
+                imgSrc = `img/ball-white-${randomIdx}.png`;
+            } else {
+                // Deterministic random selection for brown balls (1-5) based on position
+                // Using different primes/offsets to ensure different distribution than white
+                const randomIdx = ((row * 13 + col * 19) % 5) + 1;
+                imgSrc = `img/ball-brown-${randomIdx}.png`;
+            }
+            img.setAttribute('href', imgSrc);
+
+            // Add slight random rotation for variety
+            // Deterministic random based on position so it doesn't jitter on redraw
+            const rotation = ((row * 7 + col * 13) % 90) - 45;
+            img.setAttribute('transform', `rotate(${rotation}, ${x}, ${y})`);
+
+            group.appendChild(img);
+        }
+
         this.svg.appendChild(group);
 
         return group;
