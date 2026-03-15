@@ -14,9 +14,11 @@ class PaperballsGame {
         // Default: N-in-a-row for N×N grid (current behavior)
         this.winLineLength = winLineLength || n;
 
-        // Validation: winLineLength must be 3 ≤ K ≤ N
-        if (this.winLineLength < 3 || this.winLineLength > n) {
-            throw new Error(`Win line length must be between 3 and ${n}`);
+        // Validation: winLineLength must be N-1 ≤ K ≤ N
+        // Smaller values (e.g., 3-in-a-row on 5×5) give Player 1 guaranteed wins
+        const minK = Math.max(3, n - 1);
+        if (this.winLineLength < minK || this.winLineLength > n) {
+            throw new Error(`Win line length must be between ${minK} and ${n} for ${n}×${n} grid`);
         }
 
         this.grid = Array(n).fill(null).map(() => Array(n).fill(null));

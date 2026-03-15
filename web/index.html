@@ -147,11 +147,16 @@
             // Clear current options
             winLengthSelect.innerHTML = '<option value="auto" selected>N-in-a-row (Classic)</option>';
 
-            // Add options from 3 to N
-            for (let k = 3; k <= n; k++) {
+            // Only allow K >= N-1 to prevent Player 1 guaranteed wins
+            // (e.g., 3-in-a-row on 5×5 lets Player 1 win in placement phase)
+            const minK = Math.max(3, n - 1);
+            for (let k = minK; k <= n; k++) {
                 const option = document.createElement('option');
                 option.value = k;
                 option.textContent = `${k}-in-a-row`;
+                if (k < n) {
+                    option.textContent += ' (Easier)';
+                }
                 winLengthSelect.appendChild(option);
             }
         }
